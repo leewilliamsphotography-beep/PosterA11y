@@ -1456,47 +1456,55 @@ async function fetchAlts(item, query) {
     if(!grid) return;
     grid.innerHTML = '<div class="pthumb load" style="width:76px;height:76px"></div>';
     
-    let list = [];
-    const r = await searchSmart(query, doc.lang);
-    if (r && r.list) list = r.list;
-    if (list.length < 6) {
-        const osResults = await searchOpenSymbols(query);
-        list = [...list, ...osResults];
-    }
-    
-    if(!grid.isConnected || popUid !== item.uid) return;
-    
-    if(!list.length) {
-        grid.innerHTML = '<p class="pop-note">No symbols found. Try another word.</p>';
-        return;
-    }
-    
-    grid.innerHTML = list.slice(0, 12).map(k => {
-        const isARASAAC = k._id && !k.image_url;
-        const id = isARASAAC ? k._id : k.image_url;
-        const imgSrc = isARASAAC ? imgUrl(id, 300) : id;
-        const kw = (k.keywords && k.keyword[0]) || {};
-        const label = [kw.keyword, kw.meaning].filter(Boolean).join(' — ');
-        const isSelected = (isARASAAC && item.id == id) || (!isARASAAC && item.customImg == id);
-        return `<button type="button" class="alt${isSelected ? ' sel' : ''}" data-id="${id}" data-src="${imgSrc}" data-is-arasaac="${isARASAAC}"><img alt="${esc(label)}" src="${imgSrc}"><span>${esc(label)}</span></button>`;
-    }).join('');
-    
-    grid.onclick = e => {
-        const b = e.target.closest('.alt'); if(!b) return;
-        pushHistory();
-        if (b.dataset.isArasaac === 'true') {
-            item.id = Number(b.dataset.id);
-            item.customImg = null;
-        } else {
-            item.customImg = b.dataset.src;
-            item.id = null;
+    try {
+        let list = [];
+        const r = await searchSmart(query, doc.lang);
+        if (r && r.list) list = r.list;
+        
+        if (list.length < 6) {
+            const osResults = await searchOpenSymbols(query);
+            list = [...list, ...osResults];
         }
-        item.textOnly = false; 
-        item.state = 'ok';
-        // We DO NOT change item.word here! This solves the John problem.
-        updateCard(item); save(); closePopover();
-    };
-    positionPop();
+        
+        if(!grid.isConnected || popUid !== item.uid) return;
+        
+        if(!list.length) {
+            grid.innerHTML = '<p class="pop-note">No symbols found for "'+esc(query)+'". Try another word.</p>';
+            return;
+        }
+        
+        grid.innerHTML = list.slice(0, 12).map(k => {
+            const isARASAAC = k._id && !k.image_url;
+            const id = isARASAAC ? k._id : k.image_url;
+            const imgSrc = isARASAAC ? imgUrl(id, 300) : id;
+            const kw = (k.keywords && k.keywords[0]) || {};
+            const label = [kw.keyword, kw.meaning].filter(Boolean).join(' — ');
+            const isSelected = (isARASAAC && item.id == id) || (!isARASAAC && item.customImg == id);
+            return `<button type="button" class="alt${isSelected ? ' sel' : ''}" data-id="${id}" data-src="${imgSrc}" data-is-arasaac="${isARASAAC}"><img alt="${esc(label)}" src="${imgSrc}"><span>${esc(label)}</span></button>`;
+        }).join('');
+        
+        grid.onclick = e => {
+            const b = e.target.closest('.alt'); if(!b) return;
+            pushHistory();
+            if (b.dataset.isArasaac === 'true') {
+                item.id = Number(b.dataset.id);
+                item.customImg = null;
+            } else {
+                item.customImg = b.dataset.src;
+                item.id = null;
+            }
+            item.textOnly = false; 
+            item.state = 'ok';
+            // We DO NOT change item.word here! This solves the John problem.
+            updateCard(item); save(); closePopover();
+        };
+        positionPop();
+    } catch(err) {
+        console.error("Error fetching alternatives:", err);
+        if(grid.isConnected && popUid === item.uid) {
+            grid.innerHTML = '<p class="pop-note">Error loading images. Check connection.</p>';
+        }
+    }
 }
 function positionPop(){
   if(pop.hidden)return;
