@@ -959,7 +959,7 @@ function cardHTML(item,j){
   return '<button type="button" class="'+cls.join(' ')+'" data-uid="'+item.uid+'" style="animation-delay:'+delay+'ms" '+dragAttr+' '
     +'aria-label="Symbol options for '+esc(item.word)+'">'+sym+'<span class="lbl" contenteditable="false" data-ph="'+esc(item.word)+'">'+esc(item.word)+'</span>'
     +meaningHtml
-    +'<span class="vis-toggle" data-act="hide" title="Toggle visibility"><i data-lucide="${item.hidden ? 'eye-off' : 'eye'}"></i></span>'
+    +`<span class="vis-toggle" data-act="hide" title="Toggle visibility"><i data-lucide="${item.hidden ? 'eye-off' : 'eye'}"></i></span>`
     +'<span class="swap"><i data-lucide="shuffle"></i></span></button>';
 }
 function updateCard(item){
