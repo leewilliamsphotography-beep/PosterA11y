@@ -612,7 +612,7 @@ async function apiSearch(word,lang){
 // OpenSymbols API Fallback
 async function searchOpenSymbols(word) {
     try {
-        const r = await fetch(`https://www.opensymbols.org/api/v1/symbols?search=${encodeURIComponent(word)}&limit=3`);
+        const r = await fetch(`https://opensymbols.org/api/v1/symbols?search=${encodeURIComponent(word)}&limit=3`);
         if(r.ok) {
             const j = await r.json();
             if(j.length > 0) return j.map(s => ({ image_url: s.image_url }));
@@ -958,10 +958,11 @@ function cardHTML(item,j){
       meaningHtml = `<span class="meaning">${esc(item.meaning)}</span>`;
   }
   const delay=Math.min(j*30,240);
+  const visIcon = item.hidden ? 'eye-off' : 'eye';
   return '<button type="button" class="'+cls.join(' ')+'" data-uid="'+item.uid+'" style="animation-delay:'+delay+'ms" '+dragAttr+' '
     +'aria-label="Symbol options for '+esc(item.word)+'">'+sym+'<span class="lbl" contenteditable="false" data-ph="'+esc(item.word)+'">'+esc(item.word)+'</span>'
     +meaningHtml
-    +'<span class="vis-toggle" data-act="hide" title="Toggle visibility"><i data-lucide="${item.hidden ? 'eye-off' : 'eye'}"></i></span>'
+    +'<span class="vis-toggle" data-act="hide" title="Toggle visibility"><i data-lucide="'+visIcon+'"></i></span>'
     +'<span class="swap"><i data-lucide="shuffle"></i></span></button>';
 }
 function updateCard(item){
@@ -1047,13 +1048,10 @@ let libDragData = null;
 
 async function searchLibrary(word) {
     let results = [];
-    // 1. Try ARASAAC
     const r = await searchSmart(word, doc.lang);
     if (r && r.list && r.list.length) {
         results = r.list.slice(0, 6);
     }
-    
-    // 2. If ARASAAC failed or returned few results, try OpenSymbols
     if (results.length < 6) {
         const osResults = await searchOpenSymbols(word);
         results = [...results, ...osResults];
@@ -1077,7 +1075,7 @@ async function doLibrarySearch() {
         if (k.image_url) { // OpenSymbols
             return `<div class="lib-item" draggable="true" data-src="${k.image_url}" data-word="${esc(word)}"><img src="${k.image_url}" alt="${esc(word)}"></div>`;
         } else { // ARASAAC
-            const imgSrc = imgUrl(k._id, 150);
+            const imgSrc = imgUrl(k._id, 300); // FIXED SIZE
             return `<div class="lib-item" draggable="true" data-id="${k._id}" data-src="${imgSrc}" data-word="${esc(word)}"><img src="${imgSrc}" alt="${esc(word)}"></div>`;
         }
     }).join('');
@@ -1111,54 +1109,52 @@ document.addEventListener('click', e => {
     }
 });
 
-document.addEventListener('dragstart', e => {
-    const libItem = e.target.closest('.lib-item');
-    if(libItem) {
-        libDragData = { 
-            type: 'library', 
-            src: libItem.dataset.src, 
-            word: libItem.dataset.word, 
-            id: libItem.dataset.id ? Number(libItem.dataset.id) : null 
-        };
-        e.dataTransfer.effectAllowed = 'copy';
-        return;
-    }
-});
-
+/* ============ Drag & Drop (Global) ============ */
 let dragSrc = null;
 function cleanupDrag() {
     $$('.dragging').forEach(el => el.classList.remove('dragging'));
     $$('.drag-over').forEach(el => el.classList.remove('drag-over'));
     dragSrc = null; libDragData = null;
 }
+
 if(!isTouchDevice) {
-  pagesContainer.addEventListener('dragstart', e => {
+  document.addEventListener('dragstart', e => {
+      const libItem = e.target.closest('.lib-item');
       const card = e.target.closest('.card');
       const line = e.target.closest('.line');
-      if (card) {
+      
+      if (libItem) {
+          libDragData = { 
+              type: 'library', 
+              src: libItem.dataset.src, 
+              word: libItem.dataset.word, 
+              id: libItem.dataset.id ? Number(libItem.dataset.id) : null 
+          };
+          e.dataTransfer.effectAllowed = 'copy';
+          e.dataTransfer.setData('text/plain', libItem.dataset.word); // Firefox fix
+      } else if (card) {
           dragSrc = { type: 'card', uid: card.dataset.uid };
           e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', card.dataset.uid); // Firefox fix
           setTimeout(() => card.classList.add('dragging'), 0);
       } else if (line) {
           dragSrc = { type: 'line', index: getLineIndex(line) };
           e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', 'line'); // Firefox fix
           setTimeout(() => line.classList.add('dragging'), 0);
       }
   });
-  pagesContainer.addEventListener('dragover', e => {
+
+  document.addEventListener('dragover', e => {
       e.preventDefault();
       const line = e.target.closest('.line');
       const card = e.target.closest('.card');
+      $$('.drag-over').forEach(el => el.classList.remove('drag-over'));
       if (line) line.classList.add('drag-over');
       if (card) card.classList.add('drag-over');
   });
-  pagesContainer.addEventListener('dragleave', e => {
-      const line = e.target.closest('.line');
-      const card = e.target.closest('.card');
-      if (line) line.classList.remove('drag-over');
-      if (card) card.classList.remove('drag-over');
-  });
-  pagesContainer.addEventListener('drop', e => {
+
+  document.addEventListener('drop', e => {
       e.preventDefault();
       const targetCard = e.target.closest('.card');
       const targetLine = e.target.closest('.line');
@@ -1214,7 +1210,8 @@ if(!isTouchDevice) {
       }
       renderLines(); save(); cleanupDrag();
   });
-  pagesContainer.addEventListener('dragend', cleanupDrag);
+
+  document.addEventListener('dragend', cleanupDrag);
 }
 function getLineIndex(lineEl) {
     const allLineEls = $$('.paginated-sheet .line');
