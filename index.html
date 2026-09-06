@@ -90,6 +90,10 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .ibtn.danger:hover{color:var(--accent);background:var(--accent-soft)}
 .ibtn svg{width:16px;height:16px}
 
+/* Voice Dictation Mic Button */
+.mic-btn.recording{background:var(--accent);color:#fff;border-color:var(--accent);animation:mic-pulse 1.5s infinite}
+@keyframes mic-pulse{0%{box-shadow:0 0 0 0 rgba(209,76,30,.4)}70%{box-shadow:0 0 0 8px rgba(209,76,30,0)}100%{box-shadow:0 0 0 0 rgba(209,76,30,0)}}
+
 /* ---------- layout ---------- */
 .app{display:grid;grid-template-columns:340px minmax(0,1fr);align-items:start}
 .rail{border-right:1px solid var(--line);padding:28px 24px 48px;position:sticky;top:var(--tb);height:calc(100vh - var(--tb));overflow-y:auto;background:var(--surface)}
@@ -102,7 +106,8 @@ body.dark-mode .stage{background-color: #0A0A0A; background-image: linear-gradie
 .k b{font:800 11px var(--f-ui);color:var(--accent);letter-spacing:0;background:var(--accent-soft);padding:3px 6px;border-radius:4px}
 .k::after{content:"";flex:1;height:1px;background:var(--line)}
 
-#composeInput{width:100%;font:400 15px var(--f-doc);padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper);outline:none;transition:border-color .15s,box-shadow .15s;color:var(--ink)}
+.compose-wrapper{display:flex;gap:8px;align-items:stretch}
+#composeInput{flex:1;width:100%;font:400 15px var(--f-doc);padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper);outline:none;transition:border-color .15s,box-shadow .15s;color:var(--ink)}
 #composeInput:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);background:var(--surface)}
 #composeInput::placeholder{color:#9CA3AF}
 .hint{margin:12px 2px 0;font:400 13px/1.55 var(--f-doc);color:var(--ink2)}
@@ -466,6 +471,8 @@ body.dark-mode .toast svg{color:var(--accent)}
     <div class="btn-group">
       <button class="btn ghost" id="newBtn"><i data-lucide="file-plus-2"></i><span>New</span></button>
       <button class="btn ghost" id="shareBtn"><i data-lucide="link"></i><span>Share</span></button>
+      <button class="btn ghost" id="backupBtn" title="Download Backup"><i data-lucide="file-down"></i><span>Backup</span></button>
+      <button class="btn ghost" id="restoreBtn" title="Restore Backup"><i data-lucide="file-up"></i><span>Restore</span></button>
     </div>
     <div class="divider"></div>
     <div class="btn-group">
@@ -481,7 +488,10 @@ body.dark-mode .toast svg{color:var(--accent)}
   <aside class="rail">
     <section class="panel">
       <h2 class="k"><b>01</b>Write a line</h2>
-      <input id="composeInput" type="text" placeholder="Coffee morning on Saturday…" autocomplete="off" spellcheck="false" aria-label="Write a line for the poster">
+      <div class="compose-wrapper">
+        <input id="composeInput" type="text" placeholder="Coffee morning on Saturday…" autocomplete="off" spellcheck="false" aria-label="Write a line for the poster">
+        <button class="btn ghost mic-btn" id="micBtn" title="Voice dictation" aria-label="Start voice dictation"><i data-lucide="mic"></i></button>
+      </div>
       <div class="preview" id="preview" role="region" aria-label="Live preview of symbols for this line"></div>
       <button class="btn big" id="addBtn"><i data-lucide="plus"></i>Add to poster<kbd>↵</kbd></button>
       <p class="hint">Small words like <b>the</b> and <b>on</b> are skipped — symbols go on the words that matter. Press <b>Enter</b> to add the line. <br><b>Tip:</b> Paste a paragraph to split it into multiple lines automatically!</p>
@@ -579,8 +589,8 @@ body.dark-mode .toast svg{color:var(--accent)}
     <div class="pages-container" id="pagesContainer">
       <div class="sheet f-lexend active" id="sheet1">
         <img id="brandLogo" alt="Organization logo">
-        <h1 class="doc-title" id="docTitle" contenteditable="true" data-ph="Poster title" spellcheck="false"></h1>
-        <div class="doc-sub" id="docSub" contenteditable="true" data-ph="Subtitle (optional)" spellcheck="false"></div>
+        <h1 class="doc-title" id="docTitle" contenteditable="true" data-ph="Poster title" spellcheck="true"></h1>
+        <div class="doc-sub" id="docSub" contenteditable="true" data-ph="Subtitle (optional)" spellcheck="true"></div>
         <div class="lines sz-m" id="lines"></div>
         <div class="empty" id="empty">
           <h3>Nothing on the sheet yet</h3>
@@ -637,7 +647,7 @@ const dragAttr = isTouchDevice ? '' : 'draggable="true"';
 /* ============ constants ============ */
 const API_BASES=['https://api.arasaac.org/api','https://api.arasaac.org/api/v1'];
 const STATIC='https://static.arasaac.org/pictograms';
-const LS_KEY='postera11y.doc.v6'; // Bumped for multi-page
+const LS_KEY='postera11y.doc.v7'; // Bumped for voice/dup/refetch
 const LS_DRAFTS='postera11y.drafts';
 const LS_DARK='postera11y.dark';
 const LANGS={en:'English',es:'Español',fr:'Français',de:'Deutsch',it:'Italiano',pt:'Português',nl:'Nederlands',pl:'Polski',ru:'Русский',ar:'العربية',ca:'Català',gl:'Galego'};
@@ -772,15 +782,15 @@ async function tryCompoundSplit(word, lang) {
     const lw = word.toLowerCase();
     const stops = STOP[lang] || new Set();
     for (let i = 3; i < lw.length - 2; i++) {
-        const part1 = lw.substring(0, i);
-        const part2 = lw.substring(i);
-        if (stops.has(part1) || stops.has(part2)) continue; // Skip if either is a stopword
+        const part1Str = lw.substring(0, i);
+        const part2Str = lw.substring(i);
+        if (stops.has(part1Str) || stops.has(part2Str)) continue;
         
-        const r1 = await apiSearch(part1, lang);
+        const r1 = await apiSearch(part1Str, lang);
         if (r1 && r1.length) {
-            const r2 = await apiSearch(part2, lang);
+            const r2 = await apiSearch(part2Str, lang);
             if (r2 && r2.length) {
-                return { part1: r1[0], part2: r2[0] };
+                return { part1: r1[0], part2: r2[0], part1Str, part2Str };
             }
         }
     }
@@ -893,15 +903,15 @@ async function resolveItem(item){
         const kw2 = split.part2.keywords && split.part2.keywords[0];
         
         item.id = split.part1._id;
-        item.word = kw1 ? kw1.keyword : item.word; // Update label to match split
+        item.word = kw1 ? kw1.keyword : split.part1Str;
         item.grammar = getGrammarColor(split.part1.categories);
         item.meaning = kw1 ? (kw1.meaning || kw1.keyword) : null;
         item.state = 'ok';
         
         const newItem = {
             uid: uid(), 
-            word: kw2 ? kw2.keyword : item.query.substring(split.part1._id.length), // heuristic
-            query: kw2 ? kw2.keyword : null, 
+            word: kw2 ? kw2.keyword : split.part2Str,
+            query: split.part2Str, 
             id: split.part2._id, 
             customImg: null, 
             grammar: getGrammarColor(split.part2.categories),
@@ -1097,6 +1107,7 @@ function lineHTML(l,i){
     +'<div class="line-tools">'
     +'<button type="button" class="ibtn" data-act="up" title="Move up" aria-label="Move line up"><i data-lucide="chevron-up"></i></button>'
     +'<button type="button" class="ibtn" data-act="down" title="Move down" aria-label="Move line down"><i data-lucide="chevron-down"></i></button>'
+    +'<button type="button" class="ibtn" data-act="dup" title="Duplicate line" aria-label="Duplicate this line"><i data-lucide="copy"></i></button>'
     +'<button type="button" class="ibtn" data-act="edit" title="Edit line" aria-label="Edit this line"><i data-lucide="pencil"></i></button>'
     +'<button type="button" class="ibtn danger" data-act="del" title="Remove line" aria-label="Remove this line"><i data-lucide="trash-2"></i></button>'
     +'</div></div>';
@@ -1333,7 +1344,73 @@ function doLineAct(act,i){
   if(act==='del'){pushHistory();doc.lines.splice(i,1);renderLines();save();}
   else if(act==='up'&&i>0){pushHistory();const t=doc.lines[i-1];doc.lines[i-1]=doc.lines[i];doc.lines[i]=t;renderLines();save();}
   else if(act==='down'&&i<doc.lines.length-1){pushHistory();const t=doc.lines[i+1];doc.lines[i+1]=doc.lines[i];doc.lines[i]=t;renderLines();save();}
+  else if(act==='dup'){
+      pushHistory();
+      const l = doc.lines[i];
+      const newItems = l.items.map(it => ({...it, uid: uid()}));
+      doc.lines.splice(i+1, 0, {src: l.src, items: newItems});
+      renderLines();
+      save();
+  }
   else if(act==='edit'){const l=doc.lines[i];composeInput.value=l.src;pushHistory();doc.lines.splice(i,1);renderLines();save();buildPreview();composeInput.focus();}
+}
+
+/* ============ Voice Dictation Logic ============ */
+const micBtn = $('#micBtn');
+let recognition = null;
+let finalTranscript = '';
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    
+    recognition.onresult = function(event) {
+        let interimTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+            } else {
+                interimTranscript += event.results[i][0].transcript;
+            }
+        }
+        composeInput.value = finalTranscript + interimTranscript;
+        buildPreview();
+    };
+    recognition.onend = function() {
+        micBtn.classList.remove('recording');
+        micBtn.innerHTML = '<i data-lucide="mic"></i>';
+        refreshIcons();
+    };
+    recognition.onerror = function(event) {
+        toast('Voice dictation error: ' + event.error, 'alert');
+        micBtn.classList.remove('recording');
+        micBtn.innerHTML = '<i data-lucide="mic"></i>';
+        refreshIcons();
+    };
+    
+    micBtn.onclick = () => {
+        if (micBtn.classList.contains('recording')) {
+            recognition.stop();
+        } else {
+            finalTranscript = composeInput.value;
+            recognition.lang = doc.lang;
+            try {
+                recognition.start();
+                micBtn.classList.add('recording');
+                micBtn.innerHTML = '<i data-lucide="square"></i>';
+                refreshIcons();
+                toast('Listening... Click the square to stop.', 'info');
+            } catch(e) {
+                toast('Could not start microphone. Check browser permissions.', 'alert');
+            }
+        }
+    };
+} else {
+    micBtn.disabled = true;
+    micBtn.title = "Voice dictation is not supported in this browser.";
+    micBtn.style.opacity = "0.4";
 }
 
 /* ============ popover ============ */
@@ -1584,10 +1661,29 @@ function applyTpl(k){
 });
 
 langSel.onchange=()=>{
-  pushHistory(); doc.lang=langSel.value;
+  pushHistory(); 
+  const oldLang = doc.lang;
+  doc.lang=langSel.value;
   $$('.paginated-sheet').forEach(s => s.classList.toggle('rtl', RTL.has(doc.lang)));
   save();buildPreview();
-  toast('Symbol search language: '+LANGS[doc.lang]+'. Words already on the poster keep their symbols.');
+  
+  if (doc.lang !== oldLang && doc.lines.some(l => l.items.some(it => it.id != null && !it.customImg))) {
+      confirmBox('Re-fetch symbols?', 'You changed the search language to '+LANGS[doc.lang]+'. Do you want to re-fetch all existing symbols in this language?', 'Re-fetch', () => {
+          doc.lines.forEach(l => l.items.forEach(it => {
+              if (!it.customImg && !it.textOnly && it.id != null) {
+                  it.id = null;
+                  it.state = 'loading';
+              }
+          }));
+          renderLines();
+          doc.lines.forEach(l => l.items.forEach(it => {
+              if (it.state === 'loading') resolveItem(it);
+          }));
+          toast('Re-fetching symbols in ' + LANGS[doc.lang] + '...', 'info');
+      });
+  } else {
+      toast('Symbol search language: '+LANGS[doc.lang]+'. Words already on the poster keep their symbols.');
+  }
 };
 
  $('#undoBtn').onclick=undo;
@@ -1665,7 +1761,7 @@ async function copyText(txt){
   else toast('Copy failed — the link is in your address bar; copy it from there.','alert');
 };
 
-/* ============ new / print / png / word ============ */
+/* ============ new / print / png / word / backup ============ */
 let mCb=null;
 function confirmBox(t,m,ok,cb){
   $('#mTitle').textContent=t;$('#mMsg').textContent=m;$('#mOk').textContent=ok;
@@ -1801,6 +1897,45 @@ async function corsOK(){
   a.click();
   a.remove();
   toast('Word document downloaded.','check');
+};
+
+// JSON Backup & Restore
+ $('#backupBtn').onclick = () => {
+    const blob = new Blob([JSON.stringify(doc)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (doc.title||'poster').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'poster';
+    a.download += '.json';
+    document.body.append(a); a.click(); a.remove();
+    toast('Backup file downloaded.','check');
+};
+
+ $('#restoreBtn').onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json,application/json';
+    input.onchange = e => {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            try {
+                const obj = JSON.parse(ev.target.result);
+                const cleanDoc = sanitize(obj);
+                if (cleanDoc) {
+                    pushHistory();
+                    doc = cleanDoc;
+                    renderAll(); save(); closePopover();
+                    toast('Poster restored from backup!','check');
+                } else {
+                    toast('Invalid backup file.','alert');
+                }
+            } catch(err) {
+                toast('Error reading backup file.','alert');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
 };
 
 /* ============ Dark Mode Logic ============ */
