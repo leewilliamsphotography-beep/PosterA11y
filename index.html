@@ -260,6 +260,13 @@ body.dark-mode .stage{background-color: #0A0A0A; background-image: linear-gradie
 .pop-title{font:800 17px var(--f-ui);overflow-wrap:anywhere}
 .pop-body{min-height:40px}
 .pop-note{font:400 13.5px/1.55 var(--f-doc);color:var(--ink2);margin:4px 0}
+
+/* Popover Search */
+.pop-search{display:flex;gap:8px;margin-bottom:12px}
+.pop-search input{flex:1;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);font:400 14px var(--f-doc);outline:none;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+.pop-search input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);background:var(--surface)}
+.pop-search button{flex:none}
+
 .alts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:296px;overflow:auto;padding-right:2px}
 .alt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;background:var(--surface);border:1px solid var(--line);border-radius:8px;cursor:pointer}
 .alt:hover{border-color:var(--ink)} .alt.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
@@ -1075,7 +1082,7 @@ async function doLibrarySearch() {
         if (k.image_url) { // OpenSymbols
             return `<div class="lib-item" draggable="true" data-src="${k.image_url}" data-word="${esc(word)}"><img src="${k.image_url}" alt="${esc(word)}"></div>`;
         } else { // ARASAAC
-            const imgSrc = imgUrl(k._id, 300); // FIXED SIZE
+            const imgSrc = imgUrl(k._id, 300); 
             return `<div class="lib-item" draggable="true" data-id="${k._id}" data-src="${imgSrc}" data-word="${esc(word)}"><img src="${imgSrc}" alt="${esc(word)}"></div>`;
         }
     }).join('');
@@ -1131,16 +1138,16 @@ if(!isTouchDevice) {
               id: libItem.dataset.id ? Number(libItem.dataset.id) : null 
           };
           e.dataTransfer.effectAllowed = 'copy';
-          e.dataTransfer.setData('text/plain', libItem.dataset.word); // Firefox fix
+          e.dataTransfer.setData('text/plain', libItem.dataset.word); 
       } else if (card) {
           dragSrc = { type: 'card', uid: card.dataset.uid };
           e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData('text/plain', card.dataset.uid); // Firefox fix
+          e.dataTransfer.setData('text/plain', card.dataset.uid); 
           setTimeout(() => card.classList.add('dragging'), 0);
       } else if (line) {
           dragSrc = { type: 'line', index: getLineIndex(line) };
           e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData('text/plain', 'line'); // Firefox fix
+          e.dataTransfer.setData('text/plain', 'line'); 
           setTimeout(() => line.classList.add('dragging'), 0);
       }
   });
@@ -1400,16 +1407,39 @@ function renderPopBody(item){
   if(item.textOnly){html='<p class="pop-note">This word is shown as text only.</p>'+popActions('Show symbol','image');}
   else if(item.state==='loading'){html='<p class="pop-note">Looking up symbols…</p>';}
   else if(item.state==='error'){html='<p class="pop-note">Couldn’t reach the ARASAAC server. Check your connection and try again.</p><div class="pop-actions"><button type="button" class="btn small" id="popRetry"><i data-lucide="refresh-cw"></i>Try again</button><button type="button" class="btn small" id="popUpload"><i data-lucide="upload"></i>Upload Image</button></div>';}
-  else if(item.state==='nosym'){html='<p class="pop-note">No symbol found for “'+esc(item.word)+'”. Keep it as text, upload your own, or try a different word on the left.</p>'+popActions('Show symbol','image');}
-  else{html='<div class="alts" id="popAlts"><div class="pthumb load" style="width:76px;height:76px"></div></div>'+popActions('Text only','type');}
+  else if(item.state==='nosym'){html='<p class="pop-note">No symbol found for “'+esc(item.word)+'”. Keep it as text, upload your own, or search below.</p>'+'<div class="pop-search"><input type="text" id="popSearchInput" placeholder="Search for a different image..." value="'+esc(item.query||item.word)+'"><button class="ibtn" id="popSearchBtn" aria-label="Search images"><i data-lucide="search"></i></button></div><div class="alts" id="popAlts"></div>'+popActions('Text only','type');}
+  else{
+      html = `
+        <div class="pop-search">
+          <input type="text" id="popSearchInput" placeholder="Search for a different image..." value="${esc(item.query || item.word)}">
+          <button class="ibtn" id="popSearchBtn" aria-label="Search images"><i data-lucide="search"></i></button>
+        </div>
+        <div class="alts" id="popAlts"><div class="pthumb load" style="width:76px;height:76px"></div></div>
+        ${popActions('Text only','type')}`;
+  }
   body.innerHTML=html;refreshIcons();
   const t=$('#popToggle');if(t)t.onclick=()=>{pushHistory();item.textOnly=!item.textOnly;if(!item.textOnly&&item.state==='ok'&&item.id==null&&!item.customImg)item.state='loading';resolveItem(item);closePopover();};
   const rm=$('#popRemove');if(rm)rm.onclick=()=>{removeWord(item);closePopover();};
   const rt=$('#popRetry');if(rt)rt.onclick=()=>{item.state='loading';updateCard(item);resolveItem(item);renderPopBody(item);};
   const up=$('#popUpload');if(up)up.onclick=()=>handleUpload(item);
+  
+  const psBtn = $('#popSearchBtn');
+  const psInput = $('#popSearchInput');
+  if(psBtn) {
+      const doSearch = () => {
+          const q = psInput.value.trim();
+          if(q) fetchAlts(item, q);
+      };
+      psBtn.onclick = doSearch;
+      psInput.onkeydown = (e) => {
+          if(e.key === 'Enter') { e.preventDefault(); doSearch(); }
+      };
+  }
+  
   positionPop();
-  if(item.state==='ok')fillAlts(item);
+  if(item.state==='ok' || item.state==='nosym') fetchAlts(item, item.query || item.word);
 }
+
 function handleUpload(item) {
     const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
     input.onchange = e => {
@@ -1420,27 +1450,53 @@ function handleUpload(item) {
     };
     input.click();
 }
-async function fillAlts(item){
-  const grid=$('#popAlts');if(!grid)return;
-  let list=cache.get(doc.lang+':'+item.query);
-  if(!Array.isArray(list)){const v=await apiSearch(item.query,doc.lang);list=Array.isArray(v)?v:null;}
-  if(!grid.isConnected||popUid!==item.uid)return;
-  if(!list){grid.innerHTML='<p class="pop-note">Couldn’t load alternatives.</p>';return;}
-  if(!list.length){grid.innerHTML='<p class="pop-note">No alternatives for this word.</p>';return;}
-  grid.innerHTML=list.slice(0,12).map(k=>{
-    const id=k._id,kw=(k.keywords&&k.keywords[0])||{};
-    const label=[kw.keyword,kw.meaning].filter(Boolean).join(' — ');
-    return '<button type="button" class="alt'+(item.id===id?' sel':'')+'" data-id="'+id+'"><img alt="'+esc(label)+'" src="'+imgUrl(id,300)+'"><span>'+esc(label)+'</span></button>';
-  }).join('');
-  grid.onclick=e=>{
-    const b=e.target.closest('.alt');if(!b)return;
-    pushHistory(); item.id=+b.dataset.id;item.customImg=null;item.textOnly=false;item.state='ok';
-    const sel = list.find(x => x._id === item.id);
-    item.grammar = getGrammarColor(sel?.categories);
-    item.meaning = sel?.keywords && sel.keywords[0] ? (sel.keywords[0].meaning || sel.keywords[0].keyword) : null;
-    updateCard(item);save();closePopover();
-  };
-  positionPop();
+
+async function fetchAlts(item, query) {
+    const grid = $('#popAlts');
+    if(!grid) return;
+    grid.innerHTML = '<div class="pthumb load" style="width:76px;height:76px"></div>';
+    
+    let list = [];
+    const r = await searchSmart(query, doc.lang);
+    if (r && r.list) list = r.list;
+    if (list.length < 6) {
+        const osResults = await searchOpenSymbols(query);
+        list = [...list, ...osResults];
+    }
+    
+    if(!grid.isConnected || popUid !== item.uid) return;
+    
+    if(!list.length) {
+        grid.innerHTML = '<p class="pop-note">No symbols found. Try another word.</p>';
+        return;
+    }
+    
+    grid.innerHTML = list.slice(0, 12).map(k => {
+        const isARASAAC = k._id && !k.image_url;
+        const id = isARASAAC ? k._id : k.image_url;
+        const imgSrc = isARASAAC ? imgUrl(id, 300) : id;
+        const kw = (k.keywords && k.keyword[0]) || {};
+        const label = [kw.keyword, kw.meaning].filter(Boolean).join(' — ');
+        const isSelected = (isARASAAC && item.id == id) || (!isARASAAC && item.customImg == id);
+        return `<button type="button" class="alt${isSelected ? ' sel' : ''}" data-id="${id}" data-src="${imgSrc}" data-is-arasaac="${isARASAAC}"><img alt="${esc(label)}" src="${imgSrc}"><span>${esc(label)}</span></button>`;
+    }).join('');
+    
+    grid.onclick = e => {
+        const b = e.target.closest('.alt'); if(!b) return;
+        pushHistory();
+        if (b.dataset.isArasaac === 'true') {
+            item.id = Number(b.dataset.id);
+            item.customImg = null;
+        } else {
+            item.customImg = b.dataset.src;
+            item.id = null;
+        }
+        item.textOnly = false; 
+        item.state = 'ok';
+        // We DO NOT change item.word here! This solves the John problem.
+        updateCard(item); save(); closePopover();
+    };
+    positionPop();
 }
 function positionPop(){
   if(pop.hidden)return;
@@ -1714,7 +1770,7 @@ async function corsOK(){
     else if (doc.listStyle === 'numbers') marker = `<div class="line-marker">${i+1}.</div>`;
     html += `<div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: flex-start; margin-bottom: 30px; page-break-inside: avoid;">${marker}<div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">`;
     line.items.forEach(item => {
-      if(item.hidden) return; // Skip hidden
+      if(item.hidden) return; 
       const imgSrc = getImgSrc(item);
       const isTextOnly = item.textOnly || !imgSrc;
       if (isTextOnly) {
