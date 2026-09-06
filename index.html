@@ -27,10 +27,22 @@
   --f-ui:'Bricolage Grotesque','Lexend',sans-serif;
   --f-doc:'Lexend',sans-serif;
 }
+
+/* Dark Mode Variables */
+body.dark-mode{
+  --paper:#121212;
+  --surface:#1E1E1E;
+  --ink:#E8E8E8;
+  --ink2:#A0A0A0;
+  --line:#333333;
+  --line2:#262626;
+  --accent-soft:rgba(209,76,30,.25);
+}
+
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;padding:0}
-body{background:var(--paper);color:var(--ink);font-family:var(--f-doc);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-doc);-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .2s,color .2s}
 button,input,select{font-family:inherit;color:inherit}
 a{color:var(--accent)}
 ::selection{background:rgba(37,99,235,.2)}
@@ -55,7 +67,7 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .divider{width:1px;height:28px;background:var(--line)}
 .lang{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--surface)}
 .lang svg{width:16px;height:16px;color:var(--ink2)}
-.lang select{border:0;background:transparent;font:600 13px var(--f-ui);cursor:pointer}
+.lang select{border:0;background:transparent;font:600 13px var(--f-ui);cursor:pointer;color:var(--ink)}
 
 /* ---------- buttons ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 13.5px var(--f-ui);padding:8px 14px;border-radius:8px;border:1px solid transparent;background:transparent;cursor:pointer;color:var(--ink);transition:background .15s,color .15s,border-color .15s, opacity .15s}
@@ -82,6 +94,7 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .app{display:grid;grid-template-columns:340px minmax(0,1fr);align-items:start}
 .rail{border-right:1px solid var(--line);padding:28px 24px 48px;position:sticky;top:var(--tb);height:calc(100vh - var(--tb));overflow-y:auto;background:var(--surface)}
 .stage{padding:48px 48px 96px;display:flex;justify-content:center;align-items:flex-start;min-height:calc(100vh - var(--tb));background-color: #FDFDFD; background-image: linear-gradient(#EEEFEF 1px, transparent 1px), linear-gradient(90deg, #EEEFEF 1px, transparent 1px); background-size: 32px 32px;}
+body.dark-mode .stage{background-color: #0A0A0A; background-image: linear-gradient(#222 1px, transparent 1px), linear-gradient(90deg, #222 1px, transparent 1px);}
 
 /* ---------- rail panels ---------- */
 .panel{margin-bottom:32px}
@@ -89,7 +102,7 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .k b{font:800 11px var(--f-ui);color:var(--accent);letter-spacing:0;background:var(--accent-soft);padding:3px 6px;border-radius:4px}
 .k::after{content:"";flex:1;height:1px;background:var(--line)}
 
-#composeInput{width:100%;font:400 15px var(--f-doc);padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper);outline:none;transition:border-color .15s,box-shadow .15s}
+#composeInput{width:100%;font:400 15px var(--f-doc);padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper);outline:none;transition:border-color .15s,box-shadow .15s;color:var(--ink)}
 #composeInput:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);background:var(--surface)}
 #composeInput::placeholder{color:#9CA3AF}
 .hint{margin:12px 2px 0;font:400 13px/1.55 var(--f-doc);color:var(--ink2)}
@@ -121,7 +134,7 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .tpl button:hover{border-color:var(--ink);box-shadow:0 2px 4px rgba(0,0,0,0.05)}
 .field{margin:18px 0 0}
 .field>label{display:block;font:700 11px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
-.field select, .field input[type="text"]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font:400 14px var(--f-doc);cursor:pointer;outline:none}
+.field select, .field input[type="text"]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font:400 14px var(--f-doc);cursor:pointer;outline:none;color:var(--ink)}
 .field select:focus, .field input[type="text"]:focus{border-color:var(--ink)}
 .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper)}
 .seg button{flex:1;padding:9px 0;font:600 13px var(--f-ui);background:transparent;border:0;cursor:pointer;color:var(--ink2);transition:background .15s,color .15s}
@@ -143,6 +156,8 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .doc-sub{font:400 16.5px/1.45 var(--f-doc);text-align:center;color:var(--ink2);outline:none;margin:0 0 10px;white-space:pre-wrap}
 [contenteditable]:empty::before{content:attr(data-ph);color:#D1D5DB;pointer-events:none}
 [contenteditable]:focus{background:var(--accent-soft);border-radius:6px}
+
+#brandLogo{display:none;max-height:60px;max-width:150px;width:auto;height:auto;margin:0 0 15px auto;align-self:flex-end;object-fit:contain;}
 
 /* Themed Sheets */
 .sheet.theme-spring { background:#F0FFF4; border-top:12px solid #10B981; }
@@ -175,6 +190,10 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .line:last-child{border-bottom:0}
 .line.drag-over{background:var(--accent-soft)}
 .line-cards{display:flex;flex-wrap:wrap;gap:16px 10px;align-items:flex-start}
+
+/* List Markers */
+.line-marker{font:700 16px var(--f-ui);color:var(--ink2);padding-top:34px;margin-right:5px;flex:none}
+
 .sheet.rtl .line{padding:22px 0 22px 42px}
 .sheet.rtl .line-cards{direction:rtl}
 .sheet.rtl .line-tools{right:auto;left:0}
@@ -205,6 +224,10 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .card .swap svg{width:12px;height:12px}
 .card:hover .swap,.card:focus-visible .swap{opacity:1;transform:scale(1)}
 .lines.hideLbl .card:not(.textonly):not(.nosym):not(.error) .lbl{display:none}
+
+/* Editor-only Meaning Tooltip */
+.card .meaning{font:500 10px/1.2 var(--f-doc);color:#9CA3AF;max-width:132px;text-align:center;margin-top:-2px;font-style:italic}
+.lines.hideLbl .card:not(.textonly) .meaning{display:none}
 
 .empty{margin-top:14px;border:2px dashed var(--line);border-radius:12px;padding:48px 26px;text-align:center;break-inside:avoid;page-break-inside:avoid}
 .empty h3{font:800 22px var(--f-ui);margin:0 0 8px}
@@ -250,9 +273,12 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .toast{display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--surface);padding:12px 18px;border-radius:10px;font:600 13.5px var(--f-doc);box-shadow:0 10px 25px -5px rgba(0,0,0,0.3);animation:tin .22s both;transition:opacity .3s,transform .3s}
 .toast svg{width:16px;height:16px;color:#F0A183;flex:none}
 .toast.out{opacity:0;transform:translateY(8px)}
+body.dark-mode .toast{background:#E8E8E8;color:#121212}
+body.dark-mode .toast svg{color:var(--accent)}
+
 .overlay{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:grid;place-items:center;padding:20px}
 .modal{width:410px;max-width:100%;background:var(--surface);border-radius:12px;padding:28px;box-shadow:0 20px 50px -10px rgba(0,0,0,0.2)}
-.modal h3{font:800 19px var(--f-ui);margin:0 0 8px}
+.modal h3{font:800 19px var(--f-ui);margin:0 0 8px;color:var(--ink)}
 .modal p{font:400 14px/1.55 var(--f-doc);color:var(--ink2);margin:0}
 .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
 
@@ -268,7 +294,7 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 @media print{
   @page{size:A4;margin:0}
   body{background:#fff}
-  .skip-link, .topbar,.rail,.line-tools,.swap,.popover,#toasts,.overlay{display:none!important}
+  .skip-link, .topbar,.rail,.line-tools,.swap,.popover,#toasts,.overlay,.meaning{display:none!important}
   .app{display:block}
   .stage{display:block;padding:0;background:none;min-height:0}
   .sheet{width:210mm;min-height:297mm;margin:0;border-radius:0;box-shadow:none;padding:16mm 15mm 10mm}
@@ -428,6 +454,7 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
       <button class="btn ghost" id="wordBtn"><i data-lucide="file-text"></i><span>Word</span></button>
       <button class="btn ghost" id="pngBtn"><i data-lucide="image"></i><span>PNG</span></button>
       <button class="btn accent" id="printBtn"><i data-lucide="printer"></i><span>Print / PDF</span></button>
+      <button class="btn ghost" id="darkToggleBtn" title="Toggle Dark Mode"><i data-lucide="moon"></i></button>
     </div>
   </div>
 </header>
@@ -439,7 +466,7 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
       <input id="composeInput" type="text" placeholder="Coffee morning on Saturday…" autocomplete="off" spellcheck="false" aria-label="Write a line for the poster">
       <div class="preview" id="preview" role="region" aria-label="Live preview of symbols for this line"></div>
       <button class="btn big" id="addBtn"><i data-lucide="plus"></i>Add to poster<kbd>↵</kbd></button>
-      <p class="hint">Small words like <b>the</b> and <b>on</b> are skipped — symbols go on the words that matter. Press <b>Enter</b> to add the line. Tip: Double-click a word on the poster to rename it!</p>
+      <p class="hint">Small words like <b>the</b> and <b>on</b> are skipped — symbols go on the words that matter. Press <b>Enter</b> to add the line. <br><b>Tip:</b> Paste a paragraph to split it into multiple lines automatically!</p>
     </section>
 
     <section class="panel">
@@ -482,6 +509,14 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
           <option value="medical">Medical (Teal)</option>
         </select>
       </div>
+      <div class="field">
+        <label>List style</label>
+        <div class="seg" id="listSeg">
+          <button type="button" data-list="none" class="on">None</button>
+          <button type="button" data-list="bullets">Bullets</button>
+          <button type="button" data-list="numbers">Numbers</button>
+        </div>
+      </div>
       <div class="field" style="margin-bottom:20px;">
         <label>Include QR Code</label>
         <div class="seg" id="qrSeg">
@@ -492,9 +527,19 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
       <div class="field" id="qrUrlField" hidden>
         <input type="text" id="qrUrl" placeholder="https://your-link.com" autocomplete="off">
       </div>
+      
+      <div class="field" style="margin-bottom: 10px;">
+        <label>Branding Logo</label>
+        <div style="display:flex; gap:8px;">
+          <button class="btn small" id="logoUploadBtn" style="flex:1; border-color:var(--line); background:var(--paper);"><i data-lucide="upload"></i> Upload</button>
+          <button class="btn small danger" id="logoRemoveBtn" style="flex:1;" hidden><i data-lucide="trash-2"></i> Remove</button>
+        </div>
+      </div>
+
       <label class="tog"><span>Word under each symbol</span><input type="checkbox" id="showTextTog" checked></label>
       <label class="tog"><span>Sentence mode (show small words)</span><input type="checkbox" id="skipTog"></label>
       <label class="tog"><span>Color-coded grammar</span><input type="checkbox" id="grammarTog"></label>
+      <label class="tog"><span>Show symbol meanings (editor only)</span><input type="checkbox" id="meanTog"></label>
       <label class="tog"><span>High-contrast sheet</span><input type="checkbox" id="hcTog"></label>
     </section>
 
@@ -514,6 +559,7 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 
   <section class="stage">
     <div class="sheet f-lexend" id="sheet">
+      <img id="brandLogo" alt="Organization logo">
       <h1 class="doc-title" id="docTitle" contenteditable="true" data-ph="Poster title" spellcheck="false"></h1>
       <div class="doc-sub" id="docSub" contenteditable="true" data-ph="Subtitle (optional)" spellcheck="false"></div>
       <div class="lines sz-m" id="lines"></div>
@@ -565,8 +611,9 @@ const dragAttr = isTouchDevice ? '' : 'draggable="true"';
 /* ============ constants ============ */
 const API_BASES=['https://api.arasaac.org/api','https://api.arasaac.org/api/v1'];
 const STATIC='https://static.arasaac.org/pictograms';
-const LS_KEY='postera11y.doc.v4'; // Bumped version for themes
+const LS_KEY='postera11y.doc.v5'; // Bumped for list styles & logo
 const LS_DRAFTS='postera11y.drafts';
+const LS_DARK='postera11y.dark';
 const LANGS={en:'English',es:'Español',fr:'Français',de:'Deutsch',it:'Italiano',pt:'Português',nl:'Nederlands',pl:'Polski',ru:'Русский',ar:'العربية',ca:'Català',gl:'Galego'};
 const RTL=new Set(['ar']);
 
@@ -622,7 +669,7 @@ const THEME_STYLES = {
 /* ============ state & history ============ */
 let uidSeq=1;
 const uid=()=>'w'+(uidSeq++)+Date.now().toString(36);
-function newDoc(){return{title:'',subtitle:'',lang:'en',size:'m',font:'lexend',format:'portrait',theme:'default',showText:true,skipSmall:true,grammarColors:false,useQR:false,qrUrl:'',hc:false,lines:[]}}
+function newDoc(){return{title:'',subtitle:'',lang:'en',size:'m',font:'lexend',format:'portrait',theme:'default',listStyle:'none',logo:'',showText:true,skipSmall:true,grammarColors:false,showMeanings:false,useQR:false,qrUrl:'',hc:false,lines:[]}}
 let doc=newDoc();
 
 const sheet=$('#sheet'),linesEl=$('#lines'),composeInput=$('#composeInput'),previewEl=$('#preview'),
@@ -693,6 +740,27 @@ async function searchSmart(word,lang){
   }
   return{list:[],q:word};
 }
+
+/* Auto-Split Compound Words (e.g. raincoat -> rain + coat) */
+async function tryCompoundSplit(word, lang) {
+    const lw = word.toLowerCase();
+    const stops = STOP[lang] || new Set();
+    for (let i = 3; i < lw.length - 2; i++) {
+        const part1 = lw.substring(0, i);
+        const part2 = lw.substring(i);
+        if (stops.has(part1) || stops.has(part2)) continue; // Skip if either is a stopword
+        
+        const r1 = await apiSearch(part1, lang);
+        if (r1 && r1.length) {
+            const r2 = await apiSearch(part2, lang);
+            if (r2 && r2.length) {
+                return { part1: r1[0], part2: r2[0] };
+            }
+        }
+    }
+    return null;
+}
+
 function imgUrl(id,px){px=px||500;return STATIC+'/'+id+'/'+id+'_'+px+'.png';}
 (function probe(){
   (async()=>{for(const b of API_BASES){try{
@@ -737,11 +805,34 @@ function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setIt
 function addLine(text){
   text=(text||'').trim();
   if(!text){toast('Type a line first — every key word will get a symbol.');return;}
+  
+  // Bulk Paste: If text has newlines, split and add all
+  if (text.includes('\n')) {
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (lines.length > 1) {
+          pushHistory();
+          lines.forEach(l => {
+              const toks = tokenize(l, doc.lang);
+              const items = toks.filter(t => !t.skip).map(t => {
+                  const isStop = (STOP[doc.lang] || new Set()).has(t.query) || t.query === '';
+                  return { uid: uid(), word: t.display, query: t.query||null, id: null, customImg: null, grammar: null, meaning: null, textOnly: !doc.skipSmall && isStop, state: (!doc.skipSmall && isStop) ? 'ok' : 'loading' };
+              });
+              if(items.length) {
+                  doc.lines.push({src: l, items: items});
+                  items.forEach(resolveItem);
+              }
+          });
+          renderLines(); save();
+          return;
+      }
+      text = text.replace(/\r?\n/g, ' '); // Fallback to single line if only 1 line resulted
+  }
+
   const toks=tokenize(text,doc.lang);
   const items=toks.filter(t=>!t.skip).map(t=>{
     const isStop = (STOP[doc.lang] || new Set()).has(t.query) || t.query === '';
     return {
-      uid:uid(), word:t.display, query:t.query||null, id:null, customImg:null, grammar:null,
+      uid:uid(), word:t.display, query:t.query||null, id:null, customImg:null, grammar:null, meaning:null,
       textOnly: !doc.skipSmall && isStop,
       state: (!doc.skipSmall && isStop) ? 'ok' : 'loading'
     };
@@ -752,20 +843,62 @@ function addLine(text){
   renderLines();save();
   items.forEach(resolveItem);
 }
+
 async function resolveItem(item){
   if(item.customImg) {item.state='ok';updateCard(item);return;}
   if(item.query===null||item.query===''){item.state='nosym';updateCard(item);return;}
   if(item.textOnly){item.state='ok';updateCard(item);return;}
   const r=await searchSmart(item.query,doc.lang);
   if(!r){item.state='error';}
-  else if(!r.list.length){item.state='nosym';}
+  else if(!r.list.length){
+    // Try to auto-split compound words
+    const split = await tryCompoundSplit(item.query, doc.lang);
+    if (split) {
+        const kw1 = split.part1.keywords && split.part1.keywords[0];
+        const kw2 = split.part2.keywords && split.part2.keywords[0];
+        
+        item.id = split.part1._id;
+        item.word = kw1 ? kw1.keyword : item.word; // Update label to match split
+        item.grammar = getGrammarColor(split.part1.categories);
+        item.meaning = kw1 ? (kw1.meaning || kw1.keyword) : null;
+        item.state = 'ok';
+        
+        const newItem = {
+            uid: uid(), 
+            word: kw2 ? kw2.keyword : item.query.substring(split.part1._id.length), // heuristic
+            query: kw2 ? kw2.keyword : null, 
+            id: split.part2._id, 
+            customImg: null, 
+            grammar: getGrammarColor(split.part2.categories),
+            meaning: kw2 ? (kw2.meaning || kw2.keyword) : null,
+            textOnly: false, 
+            state: 'ok'
+        };
+        
+        // Find line and insert new item right after current
+        for(let i=0; i<doc.lines.length; i++) {
+            const idx = doc.lines[i].items.indexOf(item);
+            if (idx > -1) {
+                doc.lines[i].items.splice(idx + 1, 0, newItem);
+                break;
+            }
+        }
+        renderLines(); // re-render to show new item
+        save();
+        return;
+    }
+    item.state='nosym';
+  }
   else{
     item.state='ok'; item.id=r.list[0]._id;
+    const kw = r.list[0].keywords && r.list[0].keywords[0];
     item.grammar = getGrammarColor(r.list[0].categories);
+    item.meaning = kw ? (kw.meaning || kw.keyword) : null;
     item.query=r.q;
   }
   updateCard(item);save();
 }
+
 function removeWord(item){
   pushHistory();
   for(let i=0;i<doc.lines.length;i++){
@@ -790,6 +923,16 @@ function renderAll(){
   sheet.classList.remove('theme-default', 'theme-spring', 'theme-summer', 'theme-autumn', 'theme-winter', 'theme-medical');
   sheet.classList.add('theme-' + doc.theme);
   
+  // Apply Logo
+  const logoEl = $('#brandLogo');
+  if (doc.logo) {
+      logoEl.src = doc.logo;
+      logoEl.style.display = 'block';
+  } else {
+      logoEl.src = '';
+      logoEl.style.display = 'none';
+  }
+  
   applyLineClasses(); renderLines(); syncStyleControls(); applyQR();
 }
 function renderLines(){
@@ -798,8 +941,12 @@ function renderLines(){
   refreshIcons();
 }
 function lineHTML(l,i){
+  let marker = '';
+  if (doc.listStyle === 'bullets') marker = '<span class="line-marker">•</span>';
+  else if (doc.listStyle === 'numbers') marker = `<span class="line-marker">${i+1}.</span>`;
+  
   return '<div class="line" data-line="'+i+'" '+dragAttr+'>'
-    +'<div class="line-cards">'+l.items.map((it,j)=>cardHTML(it,j)).join('')+'</div>'
+    +'<div class="line-cards">'+marker+l.items.map((it,j)=>cardHTML(it,j)).join('')+'</div>'
     +'<div class="line-tools">'
     +'<button type="button" class="ibtn" data-act="up" title="Move up" aria-label="Move line up"><i data-lucide="chevron-up"></i></button>'
     +'<button type="button" class="ibtn" data-act="down" title="Move down" aria-label="Move line down"><i data-lucide="chevron-down"></i></button>'
@@ -821,9 +968,16 @@ function cardHTML(item,j){
     else if(item.state==='nosym'){ sym='<span class="sym none"><i data-lucide="image-off"></i></span>'; }
     else{ sym='<span class="sym load"></span>'; }
   }
+  
+  let meaningHtml = '';
+  if (doc.showMeanings && item.meaning && item.state === 'ok' && !item.textOnly) {
+      meaningHtml = `<span class="meaning">${esc(item.meaning)}</span>`;
+  }
+  
   const delay=Math.min(j*30,240);
   return '<button type="button" class="'+cls.join(' ')+'" data-uid="'+item.uid+'" style="animation-delay:'+delay+'ms" '+dragAttr+' '
     +'aria-label="Symbol options for '+esc(item.word)+'">'+sym+'<span class="lbl" contenteditable="false" data-ph="'+esc(item.word)+'">'+esc(item.word)+'</span>'
+    +meaningHtml
     +'<span class="swap"><i data-lucide="shuffle"></i></span></button>';
 }
 function updateCard(item){
@@ -837,14 +991,17 @@ function syncStyleControls(){
   $('#fontSel').value=doc.font;
   $('#sheetFormat').value=doc.format;
   $('#themeSel').value=doc.theme;
+  $$('#listSeg button').forEach(b=>b.classList.toggle('on',b.dataset.list===doc.listStyle));
   $('#showTextTog').checked=doc.showText;
   $('#skipTog').checked=!doc.skipSmall; 
   $('#grammarTog').checked=doc.grammarColors;
+  $('#meanTog').checked=doc.showMeanings;
   $('#hcTog').checked=doc.hc;
   langSel.value=doc.lang;
   $$('#qrSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.qr==='on') === doc.useQR));
   $('#qrUrlField').hidden = !doc.useQR;
   $('#qrUrl').value = doc.qrUrl || '';
+  $('#logoRemoveBtn').hidden = !doc.logo;
 }
 
 /* ============ QR Code Logic ============ */
@@ -1106,7 +1263,9 @@ async function fillAlts(item){
     const b=e.target.closest('.alt');if(!b)return;
     pushHistory();
     item.id=+b.dataset.id;item.customImg=null;item.textOnly=false;item.state='ok';
-    item.grammar = getGrammarColor(list.find(x => x._id === item.id)?.categories);
+    const sel = list.find(x => x._id === item.id);
+    item.grammar = getGrammarColor(sel?.categories);
+    item.meaning = sel?.keywords && sel.keywords[0] ? (sel.keywords[0].meaning || sel.keywords[0].keyword) : null;
     updateCard(item);save();closePopover();
   };
   positionPop();
@@ -1135,6 +1294,18 @@ addEventListener('resize',()=>{if(!pop.hidden)positionPop();});
 let prevSeq=0,prevTimer=null;
 composeInput.addEventListener('input',()=>{clearTimeout(prevTimer);prevTimer=setTimeout(buildPreview,280);});
 composeInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();commitCompose();}});
+
+// Bulk Paste Logic
+composeInput.addEventListener('paste', e => {
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    if (text.includes('\n')) {
+        e.preventDefault();
+        addLine(text);
+        composeInput.value=''; 
+        buildPreview();
+    }
+});
+
  $('#addBtn').onclick=commitCompose;
 function commitCompose(){
   const v=composeInput.value;
@@ -1146,7 +1317,9 @@ function buildPreview(){
   const seq=++prevSeq;
   const text=composeInput.value.trim();
   if(!text){previewEl.innerHTML='';previewEl.classList.remove('on');return;}
-  const toks=tokenize(text,doc.lang);
+  // For preview, only show the first line if pasting multiple
+  const previewText = text.split(/\r?\n/)[0];
+  const toks=tokenize(previewText,doc.lang);
   previewEl.classList.add('on');
   previewEl.innerHTML=toks.map((t,i)=>t.skip
     ?'<span class="chip skip">'+esc(t.display)+'</span>'
@@ -1183,7 +1356,7 @@ document.addEventListener('click',e=>{
 });
 function applyTpl(k){
   const t=TEMPLATES[k];
-  const keep={lang:doc.lang,size:doc.size,font:doc.font,format:doc.format,theme:doc.theme,showText:doc.showText,skipSmall:doc.skipSmall,grammarColors:doc.grammarColors,hc:doc.hc,useQR:doc.useQR,qrUrl:doc.qrUrl};
+  const keep={lang:doc.lang,size:doc.size,font:doc.font,format:doc.format,theme:doc.theme,listStyle:doc.listStyle,logo:doc.logo,showText:doc.showText,skipSmall:doc.skipSmall,grammarColors:doc.grammarColors,showMeanings:doc.showMeanings,hc:doc.hc,useQR:doc.useQR,qrUrl:doc.qrUrl};
   pushHistory();
   doc=Object.assign(newDoc(),keep,{title:t.title,subtitle:t.subtitle,lines:[]});
   renderAll();save();
@@ -1208,12 +1381,35 @@ function applyTpl(k){
   pushHistory(); doc.theme=$('#themeSel').value;
   renderAll(); save();
 };
+ $('#listSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  pushHistory(); doc.listStyle = b.dataset.list;
+  renderLines(); syncStyleControls(); save();
+});
+
+// Logo Upload
+ $('#logoUploadBtn').onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            pushHistory(); doc.logo = ev.target.result; renderAll(); save();
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+};
+ $('#logoRemoveBtn').onclick = () => { pushHistory(); doc.logo = ''; renderAll(); save(); };
+
  $('#showTextTog').onchange=e=>{pushHistory();doc.showText=e.target.checked;applyLineClasses();save();};
  $('#skipTog').onchange=e=>{
   pushHistory(); doc.skipSmall=!e.target.checked; save();buildPreview();
   toast('Sentence mode ' + (e.target.checked ? 'ON' : 'OFF') + '. Applies to new lines added.');
 };
  $('#grammarTog').onchange=e=>{pushHistory();doc.grammarColors=e.target.checked;renderLines();save();};
+ $('#meanTog').onchange=e=>{pushHistory();doc.showMeanings=e.target.checked;renderLines();save();};
  $('#hcTog').onchange=e=>{pushHistory();doc.hc=e.target.checked;sheet.classList.toggle('hc',doc.hc);applyQR();save();};
  
  $('#qrSeg').addEventListener('click', e => {
@@ -1263,14 +1459,18 @@ function sanitize(o){
   d.format=o.format === 'landscape' ? 'landscape' : 'portrait';
   const validThemes = ['default', 'spring', 'summer', 'autumn', 'winter', 'medical'];
   d.theme = validThemes.indexOf(o.theme) > -1 ? o.theme : 'default';
-  d.showText=!!o.showText;d.skipSmall=o.skipSmall!==false;d.grammarColors=!!o.grammarColors;d.hc=!!o.hc;
+  const validLists = ['none', 'bullets', 'numbers'];
+  d.listStyle = validLists.indexOf(o.listStyle) > -1 ? o.listStyle : 'none';
+  d.logo = typeof o.logo === 'string' ? o.logo.slice(0, 500000) : ''; // Limit size to prevent LS quota errors
+  d.showText=!!o.showText;d.skipSmall=o.skipSmall!==false;d.grammarColors=!!o.grammarColors;d.showMeanings=!!o.showMeanings;d.hc=!!o.hc;
   d.useQR=!!o.useQR;d.qrUrl=String(o.qrUrl||'').slice(0,500);
   d.lines=(Array.isArray(o.lines)?o.lines:[]).slice(0,80).map(l=>({
     src:String((l&&l.src)||'').slice(0,400),
     items:(Array.isArray(l&&l.items)?l.items:[]).slice(0,40).map(it=>({
       uid:uid(), word:String((it&&it.word)||'').slice(0,50),
       query:(it&&it.query)?String(it.query).slice(0,50):null,
-      id:(it&&Number(it.id))||null, customImg:(it&&it.customImg)||null, grammar:(it&&it.grammar)||null,
+      id:(it&&Number(it.id))||null, customImg:(it&&it.customImg)||null, 
+      grammar:(it&&it.grammar)||null, meaning:(it&&it.meaning)||null,
       textOnly:!!(it&&it.textOnly),
       state:(it&&(it.id!=null||it.customImg))?'ok':((it&&it.textOnly)?'ok':'loading')
     }))
@@ -1360,7 +1560,6 @@ async function corsOK(){
 
   const ts = THEME_STYLES[doc.theme] || THEME_STYLES.default;
   const hcOverride = doc.hc;
-
   const bodyBg = hcOverride ? '#000000' : ts.bg;
   const titleColor = hcOverride ? '#FFE14D' : ts.title;
   const subColor = hcOverride ? '#E8CF4F' : ts.sub;
@@ -1372,16 +1571,26 @@ async function corsOK(){
       body { background-color: ${bodyBg}; }
       h1 { color: ${titleColor}; }
       h3 { color: ${subColor}; }
+      .line-marker { font-weight: bold; font-size: 14pt; margin-right: 10px; }
     </style>
     </head>
-    <body style="font-family: 'Lexend', Arial, sans-serif; text-align: center;">
-      <h1>${esc(doc.title || '')}</h1>
-      <h3 style="font-weight: normal;">${esc(doc.subtitle || '')}</h3>
-      <div style="margin-top: 20px;">
+    <body style="font-family: 'Lexend', Arial, sans-serif; text-align: center; margin: 20px;">
   `;
 
-  doc.lines.forEach(line => {
-    html += '<div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-bottom: 30px; page-break-inside: avoid;">';
+  if (doc.logo) {
+    html += `<div style="text-align: right; margin-bottom: 20px;"><img src="${doc.logo}" style="max-height: 60px; max-width: 150px;"/></div>`;
+  }
+
+  html += `<h1>${esc(doc.title || '')}</h1><h3 style="font-weight: normal;">${esc(doc.subtitle || '')}</h3><div style="margin-top: 20px;">`;
+
+  doc.lines.forEach((line, i) => {
+    let marker = '';
+    if (doc.listStyle === 'bullets') marker = `<div class="line-marker">•</div>`;
+    else if (doc.listStyle === 'numbers') marker = `<div class="line-marker">${i+1}.</div>`;
+    
+    html += `<div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: flex-start; margin-bottom: 30px; page-break-inside: avoid;">${marker}`;
+    html += '<div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">';
+    
     line.items.forEach(item => {
       const imgSrc = getImgSrc(item);
       const isTextOnly = item.textOnly || !imgSrc;
@@ -1398,7 +1607,7 @@ async function corsOK(){
                  </div>`;
       }
     });
-    html += '</div>';
+    html += '</div></div>';
   });
 
   if (doc.useQR && doc.qrUrl) {
@@ -1428,6 +1637,16 @@ async function corsOK(){
   toast('Word document downloaded.','check');
 };
 
+/* ============ Dark Mode Logic ============ */
+const darkToggleBtn = $('#darkToggleBtn');
+function applyDarkMode(isDark) {
+    document.body.classList.toggle('dark-mode', isDark);
+    localStorage.setItem(LS_DARK, isDark ? '1' : '0');
+    darkToggleBtn.innerHTML = isDark ? '<i data-lucide="sun"></i>' : '<i data-lucide="moon"></i>';
+    refreshIcons();
+}
+darkToggleBtn.onclick = () => applyDarkMode(!document.body.classList.contains('dark-mode'));
+
 /* ============ toasts ============ */
 const TOAST_ICONS={info:'info',check:'circle-check',alert:'triangle-alert'};
 function toast(msg,kind){
@@ -1454,6 +1673,11 @@ document.addEventListener('keydown',e=>{
 /* ============ boot ============ */
 function boot(){
   Object.entries(LANGS).forEach(([k,v])=>langSel.append(new Option(v,k)));
+  
+  // Load Dark Mode
+  const isDark = localStorage.getItem(LS_DARK) === '1';
+  applyDarkMode(isDark);
+
   const fromHash=docFromHash();
   if(fromHash){
     doc=fromHash;
