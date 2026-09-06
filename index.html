@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="description" content="PosterA11y — a free, open tool for making Easy Read posters and symbol-supported materials with ARASAAC pictograms.">
-<meta name="theme-color" content="#1B2A4A">
+<meta name="theme-color" content="#F2F6FB">
 <title>PosterA11y — Easy Read posters with ARASAAC pictograms</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%231B2A4A'/%3E%3Crect x='32' y='41' width='56' height='64' rx='8' fill='%23FFFFFF'/%3E%3Ccircle cx='60' cy='69' r='19' fill='%23EAF1FA'/%3E%3Cpath d='M51.5 61 L60 68 L68.5 61 M60 63.5 L60 74.5 M54 84 L60 74.5 L66 84' fill='none' stroke='%231B2A4A' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='60' cy='57.5' r='5' fill='%231B2A4A'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%23F2F6FB'/%3E%3Crect x='32' y='41' width='56' height='64' rx='8' fill='%23FFFFFF'/%3E%3Ccircle cx='60' cy='69' r='19' fill='%23EAF1FA'/%3E%3Cpath d='M51.5 61 L60 68 L68.5 61 M60 63.5 L60 74.5 M54 84 L60 74.5 L66 84' fill='none' stroke='%231B2A4A' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='60' cy='57.5' r='5' fill='%231B2A4A'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Lexend:wght@400;500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
@@ -144,6 +144,32 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 [contenteditable]:empty::before{content:attr(data-ph);color:#D1D5DB;pointer-events:none}
 [contenteditable]:focus{background:var(--accent-soft);border-radius:6px}
 
+/* Themed Sheets */
+.sheet.theme-spring { background:#F0FFF4; border-top:12px solid #10B981; }
+.sheet.theme-spring .doc-title { color:#065F46; }
+.sheet.theme-spring .doc-sub { color:#047857; }
+.sheet.theme-spring .line { border-bottom-color:#D1FAE5; }
+
+.sheet.theme-summer { background:#FFFDE7; border-top:12px solid #F59E0B; }
+.sheet.theme-summer .doc-title { color:#92400E; }
+.sheet.theme-summer .doc-sub { color:#B45309; }
+.sheet.theme-summer .line { border-bottom-color:#FEF3C7; }
+
+.sheet.theme-autumn { background:#FFF3E0; border-top:12px solid #D14C1E; }
+.sheet.theme-autumn .doc-title { color:#7C2D12; }
+.sheet.theme-autumn .doc-sub { color:#9A3412; }
+.sheet.theme-autumn .line { border-bottom-color:#FFEDD5; }
+
+.sheet.theme-winter { background:#F0F9FF; border-top:12px solid #3B82F6; }
+.sheet.theme-winter .doc-title { color:#1E3A8A; }
+.sheet.theme-winter .doc-sub { color:#3730A3; }
+.sheet.theme-winter .line { border-bottom-color:#DBEAFE; }
+
+.sheet.theme-medical { background:#F0FDFA; border-top:12px solid #14B8A6; }
+.sheet.theme-medical .doc-title { color:#115E59; }
+.sheet.theme-medical .doc-sub { color:#0F766E; }
+.sheet.theme-medical .line { border-bottom-color:#CCFBF1; }
+
 .lines{display:flex;flex-direction:column;flex:1;padding-top:14px}
 .line{position:relative;padding:22px 42px 22px 0;border-bottom:1px solid #F0F1F3;transition:background .15s; break-inside: avoid; page-break-inside: avoid;}
 .line:last-child{border-bottom:0}
@@ -192,16 +218,16 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 .attr{text-align:center;font:400 10.5px var(--f-doc);color:#B9B097;margin:0}
 
 /* high contrast sheet */
-.sheet.hc{background:#000}
-.sheet.hc .doc-title,.sheet.hc .card .lbl{color:#FFE14D}
-.sheet.hc .doc-sub{color:#E8CF4F}
-.sheet.hc .line{border-bottom-color:#2C2921}
-.sheet.hc .card .sym{background:#fff;border-color:transparent}
+.sheet.hc{background:#000 !important; border-top:none !important;}
+.sheet.hc .doc-title,.sheet.hc .card .lbl{color:#FFE14D !important;}
+.sheet.hc .doc-sub{color:#E8CF4F !important;}
+.sheet.hc .line{border-bottom-color:#2C2921 !important;}
+.sheet.hc .card .sym{background:#fff;border-color:transparent !important;}
 .sheet.hc .card .sym.none{background:#15130E;border-color:#57513F;color:#877F66}
-.sheet.hc .attr{color:#877F66}
-.sheet.hc .empty{border-color:#3B3627}
-.sheet.hc .empty h3{color:#FFE14D}
-.sheet.hc .empty p{color:#A69D82}
+.sheet.hc .attr{color:#877F66 !important;}
+.sheet.hc .empty{border-color:#3B3627 !important;}
+.sheet.hc .empty h3{color:#FFE14D !important;}
+.sheet.hc .empty p{color:#A69D82 !important;}
 .sheet.hc #qrcode{background:#000;border-color:#444}
 
 /* ---------- popover ---------- */
@@ -330,43 +356,52 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
 
 <header class="topbar">
   <div class="brand">
-    <svg class="mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="pi-title pi-desc" focusable="false">
-      <title id="pi-title">PosterA11y icon</title>
-      <desc id="pi-desc">A white poster hangs from a pink pushpin on yellow strings. On the poster, a navy figure stands with open arms inside a pale blue circle, above two short grey text lines.</desc>
+    <svg class="mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="pi-title-l pi-desc-l" focusable="false">
+      <title id="pi-title-l">PosterA11y icon (light)</title>
+      <desc id="pi-desc-l">A white poster hangs from a pink pushpin on amber strings. On the poster, a navy figure stands with open arms inside a pale blue circle, above two short grey text lines.</desc>
+
       <defs>
-        <linearGradient id="bgGrad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#2B4073"/>
-          <stop offset="0.55" stop-color="#1B2A4A"/>
-          <stop offset="1" stop-color="#131E36"/>
+        <linearGradient id="bgGradL" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#FFFFFF"/>
+          <stop offset="0.55" stop-color="#F2F6FB"/>
+          <stop offset="1" stop-color="#E3EAF4"/>
         </linearGradient>
-        <radialGradient id="pinGrad" cx="0.35" cy="0.3" r="0.8">
+        <radialGradient id="pinGradL" cx="0.35" cy="0.3" r="0.8">
           <stop offset="0" stop-color="#FF9BB5"/>
           <stop offset="1" stop-color="#E13A66"/>
         </radialGradient>
-        <filter id="posterShadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0B1426" flood-opacity="0.45"/>
+        <filter id="posterShadowL" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#1B2A4A" flood-opacity="0.16"/>
         </filter>
-        <filter id="pinShadow" x="-60%" y="-60%" width="220%" height="220%">
-          <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#0B1426" flood-opacity="0.35"/>
+        <filter id="pinShadowL" x="-60%" y="-60%" width="220%" height="220%">
+          <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#1B2A4A" flood-opacity="0.25"/>
         </filter>
       </defs>
-      <rect width="120" height="120" rx="26" fill="url(#bgGrad)"/>
-      <rect x="1.5" y="1.5" width="117" height="117" rx="24.5" fill="none" stroke="#8FA3CC" stroke-opacity="0.25"/>
-      <path d="M34.3 43.3 L57.8 26.5" fill="none" stroke="#FFD166" stroke-width="3" stroke-linecap="round"/>
-      <path d="M85.7 43.3 L62.2 26.5" fill="none" stroke="#FFD166" stroke-width="3" stroke-linecap="round"/>
-      <rect x="32" y="41" width="56" height="64" rx="8" fill="#FFFFFF" filter="url(#posterShadow)"/>
-      <circle cx="34.3" cy="43.3" r="2.4" fill="url(#pinGrad)"/>
-      <circle cx="85.7" cy="43.3" r="2.4" fill="url(#pinGrad)"/>
+
+      <rect width="120" height="120" rx="26" fill="url(#bgGradL)"/>
+      <rect x="1.5" y="1.5" width="117" height="117" rx="24.5" fill="none" stroke="#1B2A4A" stroke-opacity="0.1"/>
+
+      <path d="M34.3 43.3 L57.8 26.5" fill="none" stroke="#F2A93B" stroke-width="3" stroke-linecap="round"/>
+      <path d="M85.7 43.3 L62.2 26.5" fill="none" stroke="#F2A93B" stroke-width="3" stroke-linecap="round"/>
+
+      <rect x="32" y="41" width="56" height="64" rx="8" fill="#FFFFFF" filter="url(#posterShadowL)"/>
+
+      <circle cx="34.3" cy="43.3" r="2.4" fill="url(#pinGradL)"/>
+      <circle cx="85.7" cy="43.3" r="2.4" fill="url(#pinGradL)"/>
+
       <circle cx="60" cy="69" r="19" fill="#EAF1FA"/>
+
       <g fill="none" stroke="#1B2A4A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M51.5 61 L60 68 L68.5 61"/>
         <path d="M60 63.5 L60 74.5"/>
         <path d="M54 84 L60 74.5 L66 84"/>
       </g>
       <circle cx="60" cy="57.5" r="5" fill="#1B2A4A"/>
+
       <rect x="40" y="91" width="40" height="4" rx="2" fill="#C5D1E5"/>
       <rect x="48" y="97" width="24" height="4" rx="2" fill="#C5D1E5"/>
-      <circle cx="60" cy="21" r="6.5" fill="url(#pinGrad)" filter="url(#pinShadow)"/>
+
+      <circle cx="60" cy="21" r="6.5" fill="url(#pinGradL)" filter="url(#pinShadowL)"/>
       <circle cx="57.9" cy="19.1" r="1.7" fill="#FFFFFF" opacity="0.85"/>
     </svg>
     <div class="brand-text">
@@ -434,6 +469,17 @@ button:focus-visible, .btn:focus-visible{outline-offset:1px}
         <select id="sheetFormat">
           <option value="portrait">A4 Portrait</option>
           <option value="landscape">A4 Landscape</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="themeSel">Poster theme</label>
+        <select id="themeSel">
+          <option value="default">Plain White</option>
+          <option value="spring">Spring (Green)</option>
+          <option value="summer">Summer (Yellow)</option>
+          <option value="autumn">Autumn (Orange)</option>
+          <option value="winter">Winter (Blue)</option>
+          <option value="medical">Medical (Teal)</option>
         </select>
       </div>
       <div class="field" style="margin-bottom:20px;">
@@ -519,7 +565,7 @@ const dragAttr = isTouchDevice ? '' : 'draggable="true"';
 /* ============ constants ============ */
 const API_BASES=['https://api.arasaac.org/api','https://api.arasaac.org/api/v1'];
 const STATIC='https://static.arasaac.org/pictograms';
-const LS_KEY='postera11y.doc.v3'; 
+const LS_KEY='postera11y.doc.v4'; // Bumped version for themes
 const LS_DRAFTS='postera11y.drafts';
 const LANGS={en:'English',es:'Español',fr:'Français',de:'Deutsch',it:'Italiano',pt:'Português',nl:'Nederlands',pl:'Polski',ru:'Русский',ar:'العربية',ca:'Català',gl:'Galego'};
 const RTL=new Set(['ar']);
@@ -528,7 +574,7 @@ const STOP={
  en:new Set('a an the and or but of to in on at for with from by as into onto about over under after before between is are was were be been am do does did doing have has had having i you he she it we they me him her us them my your his its our their this that these those will would shall should can could may might must'.split(' ')),
  es:new Set('el la los las un una unos unas y o pero de del al a en con por para sin sobre entre es son era eran fue ser soy eres está están esté estaba este esta estos estas ese esa esos esas eso mi tu su mis tus sus yo tú él ella nosotros usted ustedes ellos ellas lo le les se que más muy ya también'.split(' ')),
  fr:new Set('le la les un une des du de au aux et ou mais à en dans sur sous avec pour par sans entre est sont était étaient être suis es ce cet cette ces mon ton son ma ta sa mes tes ses je tu il elle nous vous ils elles on me te se lui leur y en'.split(' ')),
- de:new Set('der die das ein eine einen einem einer und oder aber von zu in an auf für mit ohne über unter aus bei nach seit ist sind war warst sein bist hat habe haben hatte werde wird wurden auch noch schon sehr da dann denn doch mein dein sein unser ihr euer mich dich dir mir ihm uns euch ihnen dem den des'.split(' '))
+ de:new Set('der die das ein eine einen einem einer und oder aber von zu in an auf für mit ohne über unter aus bei nach seit ist sind war warst sein bist hat habe haben hatte werde wird werden auch noch schon sehr da dann denn doch mein dein sein unser ihr euer mich dich dir mir ihm uns euch ihnen dem den des'.split(' '))
 };
 
 const CONTRA={
@@ -564,10 +610,19 @@ const GRAMMAR_COLORS = {
   noun: '#3B82F6', verb: '#D14C1E', adjective: '#10B981', adverb: '#F59E0B', preposition: '#8B5CF6', other: '#9CA3AF'
 };
 
+const THEME_STYLES = {
+  default: { bg: '#FFFFFF', title: '#1A1D21', sub: '#50545C', border: 'none' },
+  spring: { bg: '#F0FFF4', title: '#065F46', sub: '#047857', border: '12px solid #10B981' },
+  summer: { bg: '#FFFDE7', title: '#92400E', sub: '#B45309', border: '12px solid #F59E0B' },
+  autumn: { bg: '#FFF3E0', title: '#7C2D12', sub: '#9A3412', border: '12px solid #D14C1E' },
+  winter: { bg: '#F0F9FF', title: '#1E3A8A', sub: '#3730A3', border: '12px solid #3B82F6' },
+  medical: { bg: '#F0FDFA', title: '#115E59', sub: '#0F766E', border: '12px solid #14B8A6' }
+};
+
 /* ============ state & history ============ */
 let uidSeq=1;
 const uid=()=>'w'+(uidSeq++)+Date.now().toString(36);
-function newDoc(){return{title:'',subtitle:'',lang:'en',size:'m',font:'lexend',format:'portrait',showText:true,skipSmall:true,grammarColors:false,useQR:false,qrUrl:'',hc:false,lines:[]}}
+function newDoc(){return{title:'',subtitle:'',lang:'en',size:'m',font:'lexend',format:'portrait',theme:'default',showText:true,skipSmall:true,grammarColors:false,useQR:false,qrUrl:'',hc:false,lines:[]}}
 let doc=newDoc();
 
 const sheet=$('#sheet'),linesEl=$('#lines'),composeInput=$('#composeInput'),previewEl=$('#preview'),
@@ -730,6 +785,11 @@ function renderAll(){
   sheet.classList.remove('f-lexend','f-atkinson');
   sheet.classList.add('f-'+doc.font);
   sheet.classList.toggle('landscape', doc.format === 'landscape');
+  
+  // Apply Theme
+  sheet.classList.remove('theme-default', 'theme-spring', 'theme-summer', 'theme-autumn', 'theme-winter', 'theme-medical');
+  sheet.classList.add('theme-' + doc.theme);
+  
   applyLineClasses(); renderLines(); syncStyleControls(); applyQR();
 }
 function renderLines(){
@@ -776,6 +836,7 @@ function syncStyleControls(){
   $$('#sizeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.sz===doc.size));
   $('#fontSel').value=doc.font;
   $('#sheetFormat').value=doc.format;
+  $('#themeSel').value=doc.theme;
   $('#showTextTog').checked=doc.showText;
   $('#skipTog').checked=!doc.skipSmall; 
   $('#grammarTog').checked=doc.grammarColors;
@@ -1122,7 +1183,7 @@ document.addEventListener('click',e=>{
 });
 function applyTpl(k){
   const t=TEMPLATES[k];
-  const keep={lang:doc.lang,size:doc.size,font:doc.font,format:doc.format,showText:doc.showText,skipSmall:doc.skipSmall,grammarColors:doc.grammarColors,hc:doc.hc,useQR:doc.useQR,qrUrl:doc.qrUrl};
+  const keep={lang:doc.lang,size:doc.size,font:doc.font,format:doc.format,theme:doc.theme,showText:doc.showText,skipSmall:doc.skipSmall,grammarColors:doc.grammarColors,hc:doc.hc,useQR:doc.useQR,qrUrl:doc.qrUrl};
   pushHistory();
   doc=Object.assign(newDoc(),keep,{title:t.title,subtitle:t.subtitle,lines:[]});
   renderAll();save();
@@ -1142,6 +1203,10 @@ function applyTpl(k){
  $('#sheetFormat').onchange=()=>{
   pushHistory(); doc.format=$('#sheetFormat').value;
   sheet.classList.toggle('landscape', doc.format === 'landscape'); save();
+};
+ $('#themeSel').onchange=()=>{
+  pushHistory(); doc.theme=$('#themeSel').value;
+  renderAll(); save();
 };
  $('#showTextTog').onchange=e=>{pushHistory();doc.showText=e.target.checked;applyLineClasses();save();};
  $('#skipTog').onchange=e=>{
@@ -1196,6 +1261,8 @@ function sanitize(o){
   d.size=['s','m','l'].indexOf(o.size)>-1?o.size:'m';
   d.font=['lexend','atkinson'].indexOf(o.font)>-1?o.font:'lexend';
   d.format=o.format === 'landscape' ? 'landscape' : 'portrait';
+  const validThemes = ['default', 'spring', 'summer', 'autumn', 'winter', 'medical'];
+  d.theme = validThemes.indexOf(o.theme) > -1 ? o.theme : 'default';
   d.showText=!!o.showText;d.skipSmall=o.skipSmall!==false;d.grammarColors=!!o.grammarColors;d.hc=!!o.hc;
   d.useQR=!!o.useQR;d.qrUrl=String(o.qrUrl||'').slice(0,500);
   d.lines=(Array.isArray(o.lines)?o.lines:[]).slice(0,80).map(l=>({
@@ -1291,12 +1358,25 @@ async function corsOK(){
     return '';
   }
 
+  const ts = THEME_STYLES[doc.theme] || THEME_STYLES.default;
+  const hcOverride = doc.hc;
+
+  const bodyBg = hcOverride ? '#000000' : ts.bg;
+  const titleColor = hcOverride ? '#FFE14D' : ts.title;
+  const subColor = hcOverride ? '#E8CF4F' : ts.sub;
+
   let html = `
     <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-    <head><meta charset='utf-8'><title>${esc(doc.title || 'Poster')}</title></head>
+    <head><meta charset='utf-8'><title>${esc(doc.title || 'Poster')}</title>
+    <style>
+      body { background-color: ${bodyBg}; }
+      h1 { color: ${titleColor}; }
+      h3 { color: ${subColor}; }
+    </style>
+    </head>
     <body style="font-family: 'Lexend', Arial, sans-serif; text-align: center;">
       <h1>${esc(doc.title || '')}</h1>
-      <h3 style="font-weight: normal; color: #555;">${esc(doc.subtitle || '')}</h3>
+      <h3 style="font-weight: normal;">${esc(doc.subtitle || '')}</h3>
       <div style="margin-top: 20px;">
   `;
 
