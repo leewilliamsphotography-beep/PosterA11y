@@ -628,6 +628,10 @@ const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function refreshIcons(){try{if(window.lucide&&lucide.createIcons)lucide.createIcons();}catch(e){}}
 
+/* Debounced Icon Refresh - prevents UI freezing when multiple cards update at once */
+let refreshT=null;
+function debouncedRefresh(){clearTimeout(refreshT);refreshT=setTimeout(refreshIcons, 100);}
+
 /* Detect Touch Devices for Drag & Drop disabling */
 const isTouchDevice = matchMedia('(hover: none)').matches;
 const dragAttr = isTouchDevice ? '' : 'draggable="true"';
@@ -635,7 +639,7 @@ const dragAttr = isTouchDevice ? '' : 'draggable="true"';
 /* ============ constants ============ */
 const API_BASES=['https://api.arasaac.org/api','https://api.arasaac.org/api/v1'];
 const STATIC='https://static.arasaac.org/pictograms';
-const LS_KEY='postera11y.doc.v8'; // Bumped for grid lock, sr, audio
+const LS_KEY='postera11y.doc.v8';
 const LS_DRAFTS='postera11y.drafts';
 const LS_DARK='postera11y.dark';
 const LANGS={en:'English',es:'Español',fr:'Français',de:'Deutsch',it:'Italiano',pt:'Português',nl:'Nederlands',pl:'Polski',ru:'Русский',ar:'العربية',ca:'Català',gl:'Galego'};
@@ -1105,10 +1109,10 @@ function cardHTML(item,j){
     +'<span class="swap"><i data-lucide="shuffle"></i></span></button>';
 }
 function updateCard(item){
-  const el=linesEl.querySelector('[data-uid="'+item.uid+'"]');
-  if(!el)return;
-  el.outerHTML=cardHTML(item,0);
-  refreshIcons();
+  const el = document.querySelector('.card[data-uid="'+item.uid+'"]');
+  if(!el) return;
+  el.outerHTML = cardHTML(item,0);
+  debouncedRefresh();
   scheduleRepaginate();
 }
 function syncStyleControls(){
@@ -1635,7 +1639,7 @@ function setChip(i,kind,id){
   const th=el.querySelector('.pthumb');
   th.classList.remove('load');
   if(kind==='ok')th.innerHTML='<img alt="" src="'+imgUrl(id,300)+'">';
-  else{th.classList.add('none');th.innerHTML='<i data-lucide="'+(kind==='error'?'circle-alert':'image-off')+'"></i>';refreshIcons();}
+  else{th.classList.add('none');th.innerHTML='<i data-lucide="'+(kind==='error'?'circle-alert':'image-off')+'"></i>';debouncedRefresh();}
 }
 
 /* ============ templates ============ */
@@ -1655,8 +1659,10 @@ function applyTpl(k){
   pushHistory();
   doc=Object.assign(newDoc(),keep,{title:t.title,subtitle:t.subtitle,lines:[]});
   renderAll();save();
-  t.lines.forEach(addLine);
-  toast('Template loaded — edit any line, then add your own.','check');
+  toast('Loading template...', 'info');
+  setTimeout(() => {
+      t.lines.forEach(l => addLine(l));
+  }, 50);
 }
 
 /* ============ style controls ============ */
