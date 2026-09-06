@@ -150,10 +150,11 @@ body.dark-mode .stage{background-color: #0A0A0A; background-image: linear-gradie
 
 /* Library Grid */
 .lib-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;max-height:220px;overflow-y:auto;padding-right:4px}
-.lib-item{cursor:grab;border:1px solid var(--line);border-radius:8px;overflow:hidden;aspect-ratio:1/1;display:grid;place-items:center;background:var(--paper)}
-.lib-item:hover{border-color:var(--accent)}
+.lib-item{cursor:grab;border:1px solid var(--line);border-radius:8px;overflow:hidden;aspect-ratio:1/1;display:grid;place-items:center;background:var(--paper);transition:border-color .15s, transform .15s}
+.lib-item:hover{border-color:var(--accent);transform:translateY(-2px)}
 .lib-item img{width:100%;height:100%;object-fit:contain;pointer-events:none}
 .lib-item:active{cursor:grabbing}
+.lib-load{grid-column: span 3; text-align:center; padding: 20px; color: var(--ink2); font-size: 13px;}
 
 /* ---------- the sheet ---------- */
 .sheet{width:722px;max-width:100%;min-height:1020px;background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.05),0 20px 40px -20px rgba(0,0,0,0.15);padding:54px 52px 38px;display:flex;flex-direction:column;transition:width .3s, min-height .3s; --line-gap: 22px; --card-gap: 16px;}
@@ -390,7 +391,7 @@ body.locked-mode .stage { overflow-y: auto; height: 100vh; padding-top: 20px; }
         <button class="btn ghost" id="libSearchBtn"><i data-lucide="search"></i></button>
       </div>
       <div id="libResults" class="lib-grid"></div>
-      <p class="hint">Drag any symbol from here directly onto your poster lines. If ARASAAC doesn't have it, we check OpenSymbols automatically!</p>
+      <p class="hint">Drag any symbol onto your poster, or <b>click it</b> to add it to the last line. If ARASAAC doesn't have it, we check OpenSymbols automatically!</p>
     </section>
 
     <section class="panel">
@@ -525,7 +526,7 @@ const dragAttr = isTouchDevice ? '' : 'draggable="true"';
 
 const API_BASES=['https://api.arasaac.org/api','https://api.arasaac.org/api/v1'];
 const STATIC='https://static.arasaac.org/pictograms';
-const LS_KEY='postera11y.doc.v9'; // Bumped for spacing, hidden, lib
+const LS_KEY='postera11y.doc.v9'; 
 const LS_DRAFTS='postera11y.drafts';
 const LS_DARK='postera11y.dark';
 const LANGS={en:'English',es:'Español',fr:'Français',de:'Deutsch',it:'Italiano',pt:'Português',nl:'Nederlands',pl:'Polski',ru:'Русский',ar:'العربية',ca:'Català',gl:'Galego'};
@@ -608,15 +609,16 @@ async function apiSearch(word,lang){
   return v;
 }
 
+// OpenSymbols API Fallback
 async function searchOpenSymbols(word) {
     try {
-        const r = await fetch(`https://www.opensymbols.org/v1/symbols?search=${encodeURIComponent(word)}&limit=1`);
+        const r = await fetch(`https://www.opensymbols.org/api/v1/symbols?search=${encodeURIComponent(word)}&limit=3`);
         if(r.ok) {
             const j = await r.json();
-            if(j.length > 0) return j[0].image_url;
+            if(j.length > 0) return j.map(s => ({ image_url: s.image_url }));
         }
     } catch(e) {}
-    return null;
+    return [];
 }
 
 function stems(w){
@@ -762,10 +764,10 @@ async function resolveItem(item){
         renderLines(); save();
         return;
     }
-    // Fallback to OpenSymbols (Mulberry etc.)
-    const openSym = await searchOpenSymbols(item.query);
-    if(openSym) {
-        item.customImg = openSym;
+    // Fallback to OpenSymbols
+    const osResults = await searchOpenSymbols(item.query);
+    if(osResults.length > 0) {
+        item.customImg = osResults[0].image_url;
         item.state = 'ok';
         updateCard(item); save();
         return;
@@ -873,7 +875,7 @@ function repaginate() {
     const lines = [...p1Lines.children];
     lines.forEach(line => {
         if (line.id === 'empty') return; 
-        const h = line.offsetHeight + (doc.lineSpacing || 22); // offsetHeight includes padding, but we add line gap to be safe
+        const h = line.offsetHeight + (doc.lineSpacing || 22); 
         if (currentHeight + h > currentAvail) {
             const newPage = document.createElement('div');
             newPage.className = p1.className;
@@ -959,7 +961,7 @@ function cardHTML(item,j){
   return '<button type="button" class="'+cls.join(' ')+'" data-uid="'+item.uid+'" style="animation-delay:'+delay+'ms" '+dragAttr+' '
     +'aria-label="Symbol options for '+esc(item.word)+'">'+sym+'<span class="lbl" contenteditable="false" data-ph="'+esc(item.word)+'">'+esc(item.word)+'</span>'
     +meaningHtml
-    +`<span class="vis-toggle" data-act="hide" title="Toggle visibility"><i data-lucide="${item.hidden ? 'eye-off' : 'eye'}"></i></span>`
+    +'<span class="vis-toggle" data-act="hide" title="Toggle visibility"><i data-lucide="${item.hidden ? 'eye-off' : 'eye'}"></i></span>'
     +'<span class="swap"><i data-lucide="shuffle"></i></span></button>';
 }
 function updateCard(item){
@@ -1028,7 +1030,7 @@ document.addEventListener('click', e => {
   const delBtn = e.target.closest('[data-del-draft]');
   if(loadBtn) {
     const drafts = getDrafts();
-    const d = drafts.find(x => x.id === loadBtn.dataset.loadDraft);
+    const d = drafts.find(x => x.id === loadBtn.dataset.load_draft);
     if(d) { pushHistory(); doc = sanitize(d.doc); renderAll(); save(); toast('Draft loaded.','check'); }
   }
   if(delBtn) {
@@ -1044,41 +1046,80 @@ document.addEventListener('click', e => {
 let libDragData = null;
 
 async function searchLibrary(word) {
-    let list = await apiSearch(word, doc.lang);
-    let results = list && list.length ? list : [];
+    let results = [];
+    // 1. Try ARASAAC
+    const r = await searchSmart(word, doc.lang);
+    if (r && r.list && r.list.length) {
+        results = r.list.slice(0, 6);
+    }
     
+    // 2. If ARASAAC failed or returned few results, try OpenSymbols
     if (results.length < 6) {
-        try {
-            const r = await fetch(`https://www.opensymbols.org/v1/symbols?search=${encodeURIComponent(word)}&limit=6`);
-            if (r.ok) {
-                const j = await r.json();
-                const os = j.map(s => ({ _id: s.id, image_url: s.image_url, keywords: [{ keyword: word }] }));
-                results = [...results, ...os];
-            }
-        } catch(e) {}
+        const osResults = await searchOpenSymbols(word);
+        results = [...results, ...osResults];
     }
     return results;
 }
 
- $('#libSearchBtn').onclick = async () => {
+async function doLibrarySearch() {
     const word = $('#libInput').value.trim();
     if(!word) return;
     const grid = $('#libResults');
-    grid.innerHTML = '<div class="pthumb load" style="width:100%; height:60px; grid-column: span 3;"></div>';
+    grid.innerHTML = '<div class="lib-load">Searching...</div>';
+    
     const results = await searchLibrary(word);
     if(!results.length) {
-        grid.innerHTML = '<p class="hint" style="grid-column: span 3; text-align:center;">No symbols found.</p>';
+        grid.innerHTML = '<p class="hint" style="grid-column: span 3; text-align:center; margin:0;">No symbols found.</p>';
         return;
     }
-    grid.innerHTML = results.slice(0, 9).map(k => {
-        const imgSrc = k.image_url ? k.image_url : imgUrl(k._id, 150);
-        return `<div class="lib-item" draggable="true" data-id="${k._id||''}" data-src="${imgSrc}" data-word="${word}"><img src="${imgSrc}"></div>`;
+    
+    grid.innerHTML = results.map(k => {
+        if (k.image_url) { // OpenSymbols
+            return `<div class="lib-item" draggable="true" data-src="${k.image_url}" data-word="${esc(word)}"><img src="${k.image_url}" alt="${esc(word)}"></div>`;
+        } else { // ARASAAC
+            const imgSrc = imgUrl(k._id, 150);
+            return `<div class="lib-item" draggable="true" data-id="${k._id}" data-src="${imgSrc}" data-word="${esc(word)}"><img src="${imgSrc}" alt="${esc(word)}"></div>`;
+        }
     }).join('');
-};
+}
+
+ $('#libSearchBtn').onclick = doLibrarySearch;
+ $('#libInput').addEventListener('keydown', e => {
+    if(e.key === 'Enter') doLibrarySearch();
+});
+
+// Click to add (for touch devices & quick adding)
+document.addEventListener('click', e => {
+    const libItem = e.target.closest('.lib-item');
+    if(libItem) {
+        e.preventDefault();
+        pushHistory();
+        const newItem = {
+            uid: uid(), word: libItem.dataset.word, query: libItem.dataset.word,
+            id: libItem.dataset.id ? Number(libItem.dataset.id) : null,
+            customImg: libItem.dataset.id ? null : libItem.dataset.src,
+            grammar: null, meaning: null, hidden: false, textOnly: false, state: 'ok'
+        };
+        
+        if (doc.lines.length === 0) {
+            doc.lines.push({src: libItem.dataset.word, items: [newItem], accessibilityWarning: false, audio: ''});
+        } else {
+            doc.lines[doc.lines.length - 1].items.push(newItem);
+        }
+        renderLines(); save();
+        toast('Symbol added to poster.', 'check');
+    }
+});
+
 document.addEventListener('dragstart', e => {
     const libItem = e.target.closest('.lib-item');
     if(libItem) {
-        libDragData = { type: 'library', src: libItem.dataset.src, word: libItem.dataset.word, id: libItem.dataset.id };
+        libDragData = { 
+            type: 'library', 
+            src: libItem.dataset.src, 
+            word: libItem.dataset.word, 
+            id: libItem.dataset.id ? Number(libItem.dataset.id) : null 
+        };
         e.dataTransfer.effectAllowed = 'copy';
         return;
     }
@@ -1127,10 +1168,15 @@ if(!isTouchDevice) {
 
       if (libDragData) {
           const targetLineIndex = getLineIndex(targetLine);
+          if (targetLineIndex === -1 || !doc.lines[targetLineIndex]) { cleanupDrag(); return; }
           const targetLineObj = doc.lines[targetLineIndex];
-          if (!targetLineObj) { cleanupDrag(); return; }
           
-          const newItem = { uid: uid(), word: libDragData.word, query: libDragData.word, id: libDragData.id || null, customImg: libDragData.id ? null : libDragData.src, grammar: null, meaning: null, hidden: false, textOnly: false, state: 'ok' };
+          const newItem = { 
+              uid: uid(), word: libDragData.word, query: libDragData.word, 
+              id: libDragData.id, 
+              customImg: libDragData.id ? null : libDragData.src,
+              grammar: null, meaning: null, hidden: false, textOnly: false, state: 'ok' 
+          };
           
           if (targetCard) {
               const targetUid = targetCard.dataset.uid;
