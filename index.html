@@ -207,7 +207,7 @@ body.dark-mode .stage{background-color: #0A0A0A; background-image: linear-gradie
 .card:active{cursor:grabbing}
 .card:hover{transform:translateY(-2px)}
 .card.dragging{opacity:0.35;transform:scale(0.95)}
-.card .sym{display:grid;place-items:center;background:#fff;border-radius:8px;overflow:hidden;border:3px solid transparent;box-sizing:content-box; width: var(--sym-size); height: var(--sym-size);}
+.card .sym{display:grid;place-items:center;background:#fff;border-radius:8px;overflow:hidden;border:3px solid transparent;box-sizing:content-box; width: var(--sym-size, 80px); height: var(--sym-size, 80px);}
 .card .sym img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
 .card .lbl{font:600 14px/1.15 var(--f-doc);text-align:center;max-width:132px;overflow-wrap:break-word;outline:none;cursor:text;border:1px solid transparent;border-radius:4px;padding:0 2px}
 .card .lbl:hover{border-color:var(--line)}
@@ -541,7 +541,7 @@ const dragAttr = isTouchDevice ? '' : 'draggable="true"';
 
 const API_BASES=['https://api.arasaac.org/api','https://api.arasaac.org/api/v1'];
 const STATIC='https://static.arasaac.org/pictograms';
-const LS_KEY='postera11y.doc.v10'; // Bumped for symSize, templates, themes
+const LS_KEY='postera11y.doc.v10'; 
 const LS_DRAFTS='postera11y.drafts';
 const LS_DARK='postera11y.dark';
 const LANGS={en:'English',es:'Español',fr:'Français',de:'Deutsch',it:'Italiano',pt:'Português',nl:'Nederlands',pl:'Polski',ru:'Русский',ar:'العربية',ca:'Català',gl:'Galego'};
@@ -812,9 +812,9 @@ function removeWord(item){
 }
 
 function applyLineClasses(){
+    $$('.paginated-sheet').forEach(el => el.style.setProperty('--sym-size', (doc.symSize || 80) + 'px'));
     $$('.paginated-sheet .lines').forEach(el => {
         el.className = 'lines' + (doc.showText ? '' : ' hideLbl');
-        el.style.setProperty('--sym-size', (doc.symSize || 80) + 'px');
     });
 }
 
@@ -1648,7 +1648,7 @@ function applyTpl(k){
  $('#hcTog').onchange=e=>{pushHistory();doc.hc=e.target.checked;renderAll();save();};
  $('#symSizeSlider').oninput = e => {
     pushHistory(); doc.symSize = +e.target.value; $('#ssVal').textContent = doc.symSize + 'px';
-    $$('.paginated-sheet .lines').forEach(el => el.style.setProperty('--sym-size', doc.symSize + 'px'));
+    $$('.paginated-sheet').forEach(el => el.style.setProperty('--sym-size', doc.symSize + 'px'));
     scheduleRepaginate(); save();
 };
  $('#lineSpacingSlider').oninput = e => {
