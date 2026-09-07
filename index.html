@@ -157,7 +157,7 @@ body.dark-mode .stage{background-color: #0A0A0A; background-image: linear-gradie
 .lib-load{grid-column: span 3; text-align:center; padding: 20px; color: var(--ink2); font-size: 13px;}
 
 /* ---------- the sheet ---------- */
-.sheet{width:722px;max-width:100%;min-height:1020px;background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.05),0 20px 40px -20px rgba(0,0,0,0.15);padding:54px 52px 38px;display:flex;flex-direction:column;transition:width .3s, min-height .3s; --line-gap: 22px; --card-gap: 16px; --sym-size: 80px;}
+.sheet{width:722px;max-width:100%;min-height:1020px;background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.05),0 20px 40px -20px rgba(0,0,0,0.15);padding:54px 52px 38px;display:flex;flex-direction:column;transition:width .3s, min-height .3s; --line-gap: 22px; --card-gap: 16px;}
 .sheet.landscape{width:1020px;min-height:721px}
 .sheet.f-atkinson .lbl,.sheet.f-atkinson .doc-sub{font-family:'Atkinson Hyperlegible',var(--f-doc)}
 .doc-title{font:800 38px/1.12 var(--f-ui);text-align:center;margin:0 0 8px;outline:none;white-space:pre-wrap;letter-spacing:-0.02em}
@@ -181,14 +181,14 @@ body.dark-mode .stage{background-color: #0A0A0A; background-image: linear-gradie
 .sheet.theme-cafe { background:#FBF7F0; border-top:12px solid #C4A484; }
 .sheet.theme-cafe .doc-title { color:#4A3B2A; } .sheet.theme-cafe .doc-sub { color:#6B5A48; } .sheet.theme-cafe .line { border-bottom-color:#EAE0D5; }
 
-.lines{display:flex;flex-direction:column;flex:1;padding-top:14px; --sym-size: 80px;}
+.lines{display:flex;flex-direction:column;flex:1;padding-top:14px;}
 .line{position:relative;padding:var(--line-gap) 42px var(--line-gap) 0;border-bottom:1px solid #F0F1F3;transition:background .15s; break-inside: avoid; page-break-inside: avoid;}
 .line:last-child{border-bottom:0}
 .line.drag-over{background:var(--accent-soft)}
 .line-cards{display:flex;flex-wrap:wrap;gap:var(--line-gap) var(--card-gap);align-items:flex-start;justify-content:center;}
 
 /* Strict Grid Layout */
-.sheet.strict-grid .line-cards{display:grid;grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));justify-items:center;gap:var(--line-gap) var(--card-gap)}
+.lines.strict-grid .line-cards{display:grid;grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));justify-items:center;gap:var(--line-gap) var(--card-gap)}
 
 .line.accessibility-warning{border-left:4px solid var(--accent);background:rgba(209, 76, 30, 0.03)}
 .line-audio{margin-top:15px;display:flex;justify-content:center}
@@ -541,7 +541,7 @@ const dragAttr = isTouchDevice ? '' : 'draggable="true"';
 
 const API_BASES=['https://api.arasaac.org/api','https://api.arasaac.org/api/v1'];
 const STATIC='https://static.arasaac.org/pictograms';
-const LS_KEY='postera11y.doc.v11'; // Bumped for resize fix
+const LS_KEY='postera11y.doc.v12'; 
 const LS_DRAFTS='postera11y.drafts';
 const LS_DARK='postera11y.dark';
 const LANGS={en:'English',es:'Español',fr:'Français',de:'Deutsch',it:'Italiano',pt:'Português',nl:'Nederlands',pl:'Polski',ru:'Русский',ar:'العربية',ca:'Català',gl:'Galego'};
@@ -814,7 +814,7 @@ function removeWord(item){
 function applyLineClasses(){
     $$('.sheet').forEach(el => el.style.setProperty('--sym-size', (doc.symSize || 80) + 'px'));
     $$('.sheet .lines').forEach(el => {
-        el.className = 'lines' + (doc.showText ? '' : ' hideLbl');
+        el.className = 'lines' + (doc.showText ? '' : ' hideLbl') + (doc.strictGrid ? ' strict-grid' : '');
     });
 }
 
@@ -833,7 +833,6 @@ function renderAll(){
   p1.classList.toggle('landscape', doc.format === 'landscape');
   p1.classList.remove('theme-default', 'theme-spring', 'theme-summer', 'theme-autumn', 'theme-winter', 'theme-medical', 'theme-cafe');
   p1.classList.add('theme-' + doc.theme);
-  p1.classList.toggle('strict-grid', doc.strictGrid);
   
   const logoEl = $('#brandLogo');
   if (doc.logo) { logoEl.src = doc.logo; logoEl.style.display = 'block'; } 
