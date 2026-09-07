@@ -479,11 +479,11 @@ body.locked-mode .stage { overflow-y: auto; height: 100vh; padding-top: 20px; }
 
   <section class="stage">
     <div class="pages-container" id="pagesContainer">
-      <div class="sheet f-lexend active" id="sheet1">
+      <div class="sheet f-lexend active paginated-sheet" id="sheet1">
         <img id="brandLogo" alt="Organization logo">
         <h1 class="doc-title" id="docTitle" contenteditable="true" data-ph="Poster title" spellcheck="true"></h1>
         <div class="doc-sub" id="docSub" contenteditable="true" data-ph="Subtitle (optional)" spellcheck="true"></div>
-        <div class="lines sz-m" id="lines"></div>
+        <div class="lines" id="lines"></div>
         <div class="empty" id="empty">
           <h3>Nothing on the sheet yet</h3>
           <p>Type a line on the left — every key word becomes a pictogram.<br>Or start from a quick template:</p>
@@ -541,7 +541,7 @@ const dragAttr = isTouchDevice ? '' : 'draggable="true"';
 
 const API_BASES=['https://api.arasaac.org/api','https://api.arasaac.org/api/v1'];
 const STATIC='https://static.arasaac.org/pictograms';
-const LS_KEY='postera11y.doc.v10'; 
+const LS_KEY='postera11y.doc.v11'; // Bumped for resize fix
 const LS_DRAFTS='postera11y.drafts';
 const LS_DARK='postera11y.dark';
 const LANGS={en:'English',es:'Español',fr:'Français',de:'Deutsch',it:'Italiano',pt:'Português',nl:'Nederlands',pl:'Polski',ru:'Русский',ar:'العربية',ca:'Català',gl:'Galego'};
@@ -812,8 +812,8 @@ function removeWord(item){
 }
 
 function applyLineClasses(){
-    $$('.paginated-sheet').forEach(el => el.style.setProperty('--sym-size', (doc.symSize || 80) + 'px'));
-    $$('.paginated-sheet .lines').forEach(el => {
+    $$('.sheet').forEach(el => el.style.setProperty('--sym-size', (doc.symSize || 80) + 'px'));
+    $$('.sheet .lines').forEach(el => {
         el.className = 'lines' + (doc.showText ? '' : ' hideLbl');
     });
 }
@@ -1648,17 +1648,17 @@ function applyTpl(k){
  $('#hcTog').onchange=e=>{pushHistory();doc.hc=e.target.checked;renderAll();save();};
  $('#symSizeSlider').oninput = e => {
     pushHistory(); doc.symSize = +e.target.value; $('#ssVal').textContent = doc.symSize + 'px';
-    $$('.paginated-sheet').forEach(el => el.style.setProperty('--sym-size', doc.symSize + 'px'));
+    $$('.sheet').forEach(el => el.style.setProperty('--sym-size', doc.symSize + 'px'));
     scheduleRepaginate(); save();
 };
  $('#lineSpacingSlider').oninput = e => {
     pushHistory(); doc.lineSpacing = +e.target.value; $('#lsVal').textContent = doc.lineSpacing + 'px';
-    $$('.paginated-sheet').forEach(s => s.style.setProperty('--line-gap', doc.lineSpacing + 'px'));
+    $$('.sheet').forEach(s => s.style.setProperty('--line-gap', doc.lineSpacing + 'px'));
     scheduleRepaginate(); save();
 };
  $('#cardSpacingSlider').oninput = e => {
     pushHistory(); doc.cardSpacing = +e.target.value; $('#csVal').textContent = doc.cardSpacing + 'px';
-    $$('.paginated-sheet').forEach(s => s.style.setProperty('--card-gap', doc.cardSpacing + 'px'));
+    $$('.sheet').forEach(s => s.style.setProperty('--card-gap', doc.cardSpacing + 'px'));
     save();
 };
  
